@@ -22,6 +22,8 @@ new Elysia()
   .use(
     cors({
       origin: ORIGINS,
+      methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+      credentials: true,
     }),
   )
   .post(
