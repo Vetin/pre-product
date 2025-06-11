@@ -1,9 +1,9 @@
 import { featuresData } from './data';
-import { styles } from './styles';
+import { featuresStyles } from './styles';
 
 export const Features = () => {
   return (
-    <div style={styles.container} className="feature-container">
+    <div style={featuresStyles.container} className="feature-container">
       <style>
         {`
           @keyframes scroll {
@@ -18,13 +18,13 @@ export const Features = () => {
 
         `}
       </style>
-      <div style={styles.scrollingWrapper}>
-        <div style={styles.scrollingContent}>
+      <div style={featuresStyles.scrollingWrapper}>
+        <div style={featuresStyles.scrollingContent}>
           {featuresData.map((feature, index) => (
             <div
               key={`first-${index}`}
               style={{
-                ...styles.featureContainer,
+                ...featuresStyles.featureContainer,
               }}
             >
               {feature.content}
@@ -35,7 +35,7 @@ export const Features = () => {
             <div
               key={`second-${index}`}
               style={{
-                ...styles.featureContainer,
+                ...featuresStyles.featureContainer,
               }}
             >
               {feature.content}

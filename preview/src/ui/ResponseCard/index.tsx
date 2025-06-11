@@ -105,7 +105,7 @@ export const ResponseCard = ({
               height: 152px;
               bottom: -80px!important;
               left: -32px!important;
-              right: 0!important;
+              right:
               transform: rotate(-7.046deg);
             }
 
@@ -155,7 +155,8 @@ export const ResponseCard = ({
           >
             Flexible workflows, powerful results — all in one platform
           </p>
-          <button
+          <a
+            href="https://app.rask.ai/auth"
             style={{
               display: 'flex',
               width: 130,
@@ -179,7 +180,7 @@ export const ResponseCard = ({
             }}
           >
             Try it free
-          </button>
+          </a>
         </div>
 
         <div style={{ flex: '1' }} className="image-wrapper">

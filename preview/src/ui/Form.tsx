@@ -1,8 +1,9 @@
+// @ts-ignore full
 import { useState } from 'react';
 import LanguageOption from './LanguageOption';
 import { GermanFlag, FrenchFlag, EnglishFlag, SpanishFlag } from './svg/flags';
 
-import styles from './styles';
+import uploadStyles from './styles';
 import { Select } from './Select';
 import { Upload } from './Upload';
 import { OTHERS } from './lib/others';
@@ -93,14 +94,14 @@ function FormComponent() {
         setLink={setLink}
       />
 
-      <div style={styles.sectionContainer}>
-        <div style={styles.sectionBox}>
-          <div style={styles.sectionTitle}>
-            <p style={styles.sectionTitleText}>Translate to</p>
+      <div style={uploadStyles.sectionContainer}>
+        <div style={uploadStyles.sectionBox}>
+          <div style={uploadStyles.sectionTitle}>
+            <p style={uploadStyles.sectionTitleText}>Translate to</p>
           </div>
 
-          <div style={styles.languageOptionsContainer}>
-            <div style={styles.languageOptionsBox}>
+          <div style={uploadStyles.languageOptionsContainer}>
+            <div style={uploadStyles.languageOptionsBox}>
               <LanguageOption
                 language="German"
                 flag={<GermanFlag />}

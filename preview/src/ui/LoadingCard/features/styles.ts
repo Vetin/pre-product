@@ -1,6 +1,6 @@
 import type { CSSProperties } from 'react';
 
-export const styles = {
+export const featuresStyles = {
   container: {
     display: 'flex',
     alignItems: 'center',

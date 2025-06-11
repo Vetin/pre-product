@@ -1,4 +1,4 @@
-export const styles = {
+export const loadingCardStyles = {
   title: {
     display: 'flex',
     alignItems: 'center',
