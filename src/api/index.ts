@@ -7,7 +7,7 @@ import {
 } from './deepl';
 import cors from '@elysiajs/cors';
 import { rm } from 'fs/promises';
-import { write } from 'fs';
+
 import { writeFile } from 'fs/promises';
 import { fileTypeFromBuffer } from 'file-type';
 
@@ -64,8 +64,6 @@ new Elysia()
             lang,
             formality,
           );
-
-          await Bun.write(`./output.${crypto.randomUUID()}`, translatedBuffer);
 
           return {
             status: 'success',
