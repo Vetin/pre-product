@@ -1,3 +1,5 @@
+import React from 'react';
+import { createPortal } from 'react-dom';
 import {
   useEffect,
   useMemo,
@@ -30,43 +32,30 @@ function FormComponent() {
     setIsLoading(false);
     setResponse(selectedFile);
 
-    // setIsLoading(true);
+    setIsLoading(true);
 
-    // const basePayload = {
-    //   lang: selectedLanguage,
-    //   formality: tone ?? 'default',
-    // };
-    // const payload = selectedFile
-    //   ? {
-    //       ...basePayload,
-    //       file: await new Promise(resolve => {
-    //         const reader = new FileReader();
-    //         reader.onloadend = () => resolve(reader.result);
-    //         reader.readAsDataURL(selectedFile);
-    //       }),
-    //     }
-    //   : { ...basePayload, link };
+    const basePayload = {
+      lang: selectedLanguage,
+      formality: tone ?? 'default',
+    };
+    const payload = selectedFile
+      ? {
+          ...basePayload,
+          file: await new Promise(resolve => {
+            const reader = new FileReader();
+            reader.onloadend = () => resolve(reader.result);
+            reader.readAsDataURL(selectedFile);
+          }),
+        }
+      : { ...basePayload, link };
 
-    // const response = await api('/document', payload);
+    const response = await api('/document', payload);
 
-    // setIsLoading(false);
+    setIsLoading(false);
 
-    // if (response.status === 'error') return;
+    if (response.status === 'error') return;
 
-    // setResponse(new File([response.data], selectedFile?.name ?? ''));
-
-    // Simulate API call
-    // setTimeout(() => {
-    //   console.log('File:', selectedFile);
-    //   console.log('Link:', link);
-    //   console.log('Language:', selectedLanguage);
-    //   console.log('Tone:', tone);
-    //   setIsLoading(false);
-    //   alert('Translation request submitted successfully!');
-    //   // Reset form
-    //   setSelectedFile(null);
-    //   setLink('');
-    // }, 2000);
+    setResponse(new File([response.data], selectedFile?.name ?? ''));
   };
 
   const translateAnother = () => {
@@ -2243,8 +2232,19 @@ const Select = ({
   );
 };
 
-import React from 'react';
-import { createPortal } from 'react-dom';
+const BASE_URL = 'https://pre-product.onrender.com';
+
+const api = async (url: string, body: unknown) => {
+  const response = await fetch(`${BASE_URL}${url}`, {
+    method: 'POST',
+    body: JSON.stringify(body),
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+
+  return response.json();
+};
 
 type Language = 'German' | 'French' | 'English' | 'Spanish' | 'Other';
 

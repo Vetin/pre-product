@@ -1,5 +1,7 @@
+const BASE_URL = 'http://localhost:3000';
+
 export const api = async (url: string, body: unknown) => {
-  const response = await fetch(`http://localhost:3000${url}`, {
+  const response = await fetch(`${BASE_URL}${url}`, {
     method: 'POST',
     body: JSON.stringify(body),
     headers: {
