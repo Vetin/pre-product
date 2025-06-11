@@ -1,6 +1,6 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
-import Form from './ui/Form';
+import Form from './ui/FinalForm';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

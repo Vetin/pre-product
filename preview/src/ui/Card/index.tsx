@@ -1,5 +1,5 @@
 import type { CSSProperties } from 'react';
-import styles from '../styles';
+import uploadStyles from '../styles';
 
 export const Card = ({
   children,
@@ -9,8 +9,8 @@ export const Card = ({
   styles?: CSSProperties;
 }) => {
   return (
-    <div style={styles.container}>
-      <div style={styles.innerContainer}>
+    <div style={uploadStyles.container}>
+      <div style={uploadStyles.innerContainer}>
         <style>{`
             @media screen and (max-width: 1024px) {
               .__card {
@@ -18,7 +18,10 @@ export const Card = ({
               }
             }
           `}</style>
-        <div style={{ ...styles.contentBox, ...propStyles }} className="__card">
+        <div
+          style={{ ...uploadStyles.contentBox, ...propStyles }}
+          className="__card"
+        >
           {children}
         </div>
       </div>

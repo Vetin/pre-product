@@ -1,6 +1,6 @@
 import type { CSSProperties } from 'react';
 
-const styles = {
+const uploadStyles = {
   container: {
     backgroundColor: '#ffffff',
     position: 'relative',
@@ -561,4 +561,4 @@ const styles = {
   } as CSSProperties,
 };
 
-export default styles;
+export default uploadStyles;

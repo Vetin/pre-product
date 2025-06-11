@@ -1,5 +1,5 @@
 import { Card } from '../Card';
-import { styles } from './styles';
+import { loadingCardStyles } from './styles';
 import { Loader } from './loader';
 import { Button } from '../Button';
 import { Features } from './features';
@@ -14,15 +14,15 @@ export const LoadingCard = () => {
         padding: '40px 0',
       }}
     >
-      <div style={styles.title}>
+      <div style={loadingCardStyles.title}>
         <Loader />
-        <p style={styles.titleText}>Translating your document</p>
+        <p style={loadingCardStyles.titleText}>Translating your document</p>
       </div>
 
-      <div style={styles.cta}>
-        <p style={styles.ctaTitle}>
+      <div style={loadingCardStyles.cta}>
+        <p style={loadingCardStyles.ctaTitle}>
           Take your message further — go global with your videos in one click{' '}
-          <span style={styles.ctaTitleMarked}>with Rask AI</span>
+          <span style={loadingCardStyles.ctaTitleMarked}>with Rask AI</span>
         </p>
         <Button size="small" styles={{ width: 'fit-content' }}>
           Translate 3 videos for free

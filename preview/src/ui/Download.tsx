@@ -1,4 +1,4 @@
-import styles from './styles';
+import uploadStyles from './styles';
 
 export const Download = ({ value }: { value: File | null }) => {
   const downloadFile = () => {
@@ -18,13 +18,17 @@ export const Download = ({ value }: { value: File | null }) => {
 
   return (
     <div
-      style={{ ...styles.sectionContainer, cursor: 'pointer', maxWidth: 427 }}
+      style={{
+        ...uploadStyles.sectionContainer,
+        cursor: 'pointer',
+        maxWidth: 427,
+      }}
       onClick={downloadFile}
     >
-      <div style={styles.sectionBox}>
-        <div style={styles.uploadedFileContainer}>
-          <div style={styles.uploadedFileContent}>
-            <div style={styles.uploadedFileIcon}>
+      <div style={uploadStyles.sectionBox}>
+        <div style={uploadStyles.uploadedFileContainer}>
+          <div style={uploadStyles.uploadedFileContent}>
+            <div style={uploadStyles.uploadedFileIcon}>
               <svg
                 width="36"
                 height="36"
@@ -43,9 +47,9 @@ export const Download = ({ value }: { value: File | null }) => {
                 />
               </svg>
             </div>
-            <div style={styles.uploadedFileInfo}>
-              <p style={styles.uploadedFileName}>{value.name}</p>
-              <p style={styles.uploadedFileSize}>
+            <div style={uploadStyles.uploadedFileInfo}>
+              <p style={uploadStyles.uploadedFileName}>{value.name}</p>
+              <p style={uploadStyles.uploadedFileSize}>
                 {(() => {
                   const units = ['B', 'KB', 'MB', 'GB', 'TB'];
                   let size = value.size;
@@ -61,7 +65,7 @@ export const Download = ({ value }: { value: File | null }) => {
               </p>
             </div>
           </div>
-          <button style={styles.uploadedFileRemove}>
+          <button style={uploadStyles.uploadedFileRemove}>
             <svg
               width="20"
               height="20"
