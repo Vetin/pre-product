@@ -65,6 +65,8 @@ new Elysia()
             formality,
           );
 
+          await Bun.write(`./output.${crypto.randomUUID()}`, translatedBuffer);
+
           return {
             status: 'success',
             data: translatedBuffer.toString('base64'),
@@ -92,7 +94,39 @@ new Elysia()
         }
       }
 
-      if (link) {
+      if ('link' in body) {
+        try {
+          const { link } = body;
+
+          const translatedBuffer = await translator.translateFromUrl(
+            link,
+            lang,
+            formality,
+          );
+
+          return {
+            status: 'success',
+            data: translatedBuffer.toString('base64'),
+          };
+        } catch (error) {
+          switch (true) {
+            case error instanceof FileValidationError:
+              return {
+                status: 'error',
+                message: 'File validation error: ' + error.message,
+              };
+            case error instanceof TranslationError:
+              return {
+                status: 'error',
+                message: 'Translation error: ' + error.message,
+              };
+            default:
+              return {
+                status: 'error',
+                message: 'Unexpected error: ' + error,
+              };
+          }
+        }
       }
 
       return {
