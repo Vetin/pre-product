@@ -1,6 +1,6 @@
 import type { CSSProperties } from 'react';
 
-export const styles = {
+export const buttonStyles = {
   button: (isDisabled: boolean, size: 'small' | 'large') =>
     ({
       position: 'relative',

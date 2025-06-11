@@ -13,7 +13,7 @@ const LanguageOption = ({
       flexGrow: 1,
       height: '44px',
       minHeight: '1px',
-      minWidth: '1px',
+      // minWidth: '1px',
       position: 'relative',
       borderRadius: '59px',
       flexShrink: 0,

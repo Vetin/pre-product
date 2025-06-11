@@ -67,7 +67,7 @@ const styles = {
     fontSize: '24px',
     margin: 0,
   } as CSSProperties,
-  dragDropArea: (dragActive: boolean) =>
+  dragDropArea: (dragActive: boolean, invalid: boolean) =>
     ({
       position: 'relative',
       flexShrink: 0,
@@ -75,7 +75,8 @@ const styles = {
       backgroundColor: dragActive ? '#f5f5ff' : 'transparent',
       height: '200px',
       borderRadius: '16px',
-      border: '1px dashed #8f8ff3',
+      border: '1px dashed',
+      borderColor: invalid ? '#FDA29B' : '#8f8ff3',
     } as CSSProperties),
   dragDropContent: {
     display: 'flex',
@@ -235,14 +236,16 @@ const styles = {
     border: 'none',
     outline: 'none',
   } as CSSProperties,
-  linkInputBorder: {
-    position: 'absolute',
-    border: '1px solid #d0d5dd',
-    borderStyle: 'solid',
-    inset: 0,
-    pointerEvents: 'none',
-    borderRadius: '12px',
-  } as CSSProperties,
+  linkInputBorder: (invalid: boolean) =>
+    ({
+      position: 'absolute',
+      border: '1px solid',
+      borderStyle: 'solid',
+      inset: 0,
+      pointerEvents: 'none',
+      borderRadius: '12px',
+      borderColor: invalid ? '#FDA29B' : '#d0d5dd',
+    } as CSSProperties),
   languageOptionsContainer: {
     position: 'relative',
     flexShrink: 0,
@@ -258,7 +261,9 @@ const styles = {
     padding: 0,
     position: 'relative',
     width: '100%',
-    flexWrap: 'wrap',
+    flexWrap: 'nowrap',
+    overflow: 'auto',
+    scrollbarWidth: 'none',
   } as CSSProperties,
   languageOption: (isSelected: boolean) =>
     ({
@@ -267,7 +272,7 @@ const styles = {
       flexGrow: 1,
       height: '44px',
       minHeight: '1px',
-      minWidth: '1px',
+      // minWidth: '1px',
       width: 140,
       position: 'relative',
       borderRadius: '59px',
@@ -498,11 +503,11 @@ const styles = {
     alignItems: 'center',
     gap: '12px',
     flex: 1,
+    overflow: 'hidden',
   } as CSSProperties,
   uploadedFileIcon: {
     width: '40px',
     height: '40px',
-    backgroundColor: '#3d3de9',
     borderRadius: '8px',
     display: 'flex',
     alignItems: 'center',

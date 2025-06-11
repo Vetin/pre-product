@@ -1,7 +1,7 @@
-import { GreekFlag } from '../svg/flags/GreekFlag';
-import { IsralianFlag } from '../svg/flags/IsralianFlag';
-import { NorwegianFlag } from '../svg/flags/NorwegianFlat';
-import { TurkishFlag } from '../svg/flags/TurkishFlag';
+import { GreekFlag } from '../svg/flags';
+import { IsralianFlag } from '../svg/flags';
+import { NorwegianFlag } from '../svg/flags';
+import { TurkishFlag } from '../svg/flags';
 
 export const OTHERS = [
   {
