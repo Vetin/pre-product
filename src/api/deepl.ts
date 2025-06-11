@@ -192,7 +192,6 @@ export class DeepLTranslator {
         );
 
         if (status.status === 'error') {
-          console.log(status);
           throw new TranslationError(
             status.error_message || 'Unknown error during translation',
           );
@@ -219,10 +218,9 @@ export class DeepLTranslator {
 
   async translateFromUrl(
     url: string,
-    outputPath: string,
     targetLang: TargetLanguage,
     formality: Formality = 'default',
-  ): Promise<string> {
+  ) {
     try {
       this.validateFileUrl(url);
 
@@ -236,13 +234,7 @@ export class DeepLTranslator {
 
       try {
         this.validateFile(tempPath);
-        const result = await this.translateDocument(
-          tempPath,
-          targetLang,
-          formality,
-        );
-        fs.writeFileSync(outputPath, result);
-        return outputPath;
+        return await this.translateDocument(tempPath, targetLang, formality);
       } finally {
         if (fs.existsSync(tempPath)) {
           fs.unlinkSync(tempPath);

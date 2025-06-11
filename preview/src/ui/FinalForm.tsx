@@ -27,13 +27,6 @@ function FormComponent() {
 
     setIsLoading(true);
 
-    await new Promise(resolve => setTimeout(resolve, 5000));
-
-    setIsLoading(false);
-    setResponse(selectedFile);
-
-    setIsLoading(true);
-
     const basePayload = {
       lang: selectedLanguage,
       formality: tone ?? 'default',
@@ -53,9 +46,19 @@ function FormComponent() {
 
     setIsLoading(false);
 
-    if (response.status === 'error') return;
+    if (response.status === 'error') {
+      setIsLoading(false);
+      const method = 'link' in payload ? setLinkError : setFileError;
+      method(response.message ?? 'Unknown error');
+      return;
+    }
 
-    setResponse(new File([response.data], selectedFile?.name ?? ''));
+    const bytes = Uint8Array.from(atob(response.data), c => c.charCodeAt(0));
+    const file = new File([bytes], selectedFile?.name ?? 'output.txt', {
+      type: selectedFile?.type ?? 'text/plain',
+    });
+
+    setResponse(file);
   };
 
   const translateAnother = () => {
@@ -64,6 +67,9 @@ function FormComponent() {
     setTone(null);
     setResponse(null);
   };
+
+  const [fileError, setFileError] = useState<boolean | string>(false);
+  const [linkError, setLinkError] = useState<boolean | string>(false);
 
   if (isLoading) return <LoadingCard />;
 
@@ -77,6 +83,10 @@ function FormComponent() {
         value={selectedFile}
         link={link}
         setLink={setLink}
+        fileError={fileError}
+        setFileError={setFileError}
+        linkError={linkError}
+        setLinkError={setLinkError}
       />
 
       <div style={uploadStyles.sectionContainer}>
@@ -352,7 +362,7 @@ const ResponseCard = ({
 
         <div style={{ flex: '1' }} className="image-wrapper">
           <img
-            src=""
+            src="https://framerusercontent.com/images/BxZr79QnA7V7s0eH61Z7PXPl1k.png"
             alt="Editor"
             className="image-editor"
             width={292}
@@ -364,7 +374,7 @@ const ResponseCard = ({
             }}
           />
           <img
-            src=""
+            src="https://framerusercontent.com/images/FryGpy9mQQ2OdHQRi139zjh5v9A.png"
             alt="Video"
             width={185}
             height={130}
@@ -377,7 +387,7 @@ const ResponseCard = ({
             }}
           />
           <img
-            src=""
+            src="https://framerusercontent.com/images/SS1jmFtYlXXWWpUlXvksS7fmN4.png"
             alt="Grid"
             width={289}
             height={340}
@@ -1254,16 +1264,22 @@ const Upload = ({
   value,
   link,
   setLink,
+  fileError,
+  setFileError,
+  linkError,
+  setLinkError,
 }: {
   onChange: (file: File | null) => void;
   value: File | null;
   link: string;
   setLink: (link: string) => void;
   types?: Array<{ ext: string; label: string; type: string }>;
+  fileError: boolean | string;
+  setFileError: (error: boolean | string) => void;
+  linkError: boolean | string;
+  setLinkError: (error: boolean | string) => void;
 }) => {
   const [dragActive, setDragActive] = useState<boolean>(false);
-  const [fileError, setFileError] = useState<boolean>(false);
-  const [linkError, setLinkError] = useState<boolean>(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -1289,12 +1305,9 @@ const Upload = ({
     if (e.dataTransfer.files && e.dataTransfer.files[0]) {
       const file = e.dataTransfer.files[0];
 
-      const type = file.type.split('/')?.[1] ?? '';
+      const type = file.name.split('.').pop();
 
-      if (
-        type !== 'plain' &&
-        !SUPPORTED_FILE_TYPES.includes(`.${file.type.split('/')?.[1] ?? ''}`)
-      ) {
+      if (!SUPPORTED_FILE_TYPES.includes(`.${type}`)) {
         setFileError(true);
         return;
       }
@@ -1327,7 +1340,7 @@ const Upload = ({
 
     if (!ext) return;
 
-    if (!SUPPORTED_FILE_TYPES.includes(ext)) {
+    if (!SUPPORTED_FILE_TYPES.includes(`.${ext}`)) {
       setLinkError(true);
     }
   };
@@ -1443,7 +1456,7 @@ const Upload = ({
               </div>
             </div>
           </div>
-          {fileError && <FormatError />}
+          {fileError && <FormatError message={fileError} />}
         </div>
 
         <div style={uploadStyles.linkInput}>
@@ -1457,15 +1470,15 @@ const Upload = ({
               />
             </div>
           </div>
-          <div style={uploadStyles.linkInputBorder(linkError)} />
-          {linkError && <FormatError />}
+          <div style={uploadStyles.linkInputBorder(Boolean(linkError))} />
+          {linkError && <FormatError message={linkError} />}
         </div>
       </div>
     </div>
   );
 };
 
-const FormatError = () => (
+const FormatError = ({ message }: { message: string | boolean }) => (
   <p
     style={{
       color: '#D92D20',
@@ -1476,8 +1489,9 @@ const FormatError = () => (
       lineHeight: '20px',
     }}
   >
-    File type not supported. Please upload one of the following types: PDF, DOC,
-    DOCX, PPT, PPTX, AI.
+    {typeof message === 'string'
+      ? message
+      : `File type not supported. Please upload one of the following types: PDF, DOC, DOCX, PPT, PPTX, AI.`}
   </p>
 );
 
@@ -2232,7 +2246,8 @@ const Select = ({
   );
 };
 
-const BASE_URL = 'https://pre-product.onrender.com';
+// const BASE_URL = 'https://pre-product.onrender.com';
+const BASE_URL = 'http://localhost:3000';
 
 const api = async (url: string, body: unknown) => {
   const response = await fetch(`${BASE_URL}${url}`, {
@@ -2242,6 +2257,13 @@ const api = async (url: string, body: unknown) => {
       'Content-Type': 'application/json',
     },
   });
+
+  if (response.status !== 200) {
+    return {
+      status: 'error',
+      message: 'Failed to translate',
+    };
+  }
 
   return response.json();
 };
