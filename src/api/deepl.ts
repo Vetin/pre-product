@@ -51,14 +51,14 @@ const FILE_SIZE_LIMITS: FileSizeLimits = {
 };
 
 // Custom error classes
-class FileValidationError extends Error {
+export class FileValidationError extends Error {
   constructor(message: string) {
     super(message);
     this.name = 'FileValidationError';
   }
 }
 
-class TranslationError extends Error {
+export class TranslationError extends Error {
   constructor(message: string) {
     super(message);
     this.name = 'TranslationError';
@@ -78,16 +78,8 @@ export class DeepLTranslator {
   private validateFile(filePath: string): void {
     const ext = path.extname(filePath).toLowerCase().replace('.', '');
 
-    if (!DEEPL_SUPPORTED_FORMATS[ext]) {
-      throw new FileValidationError(
-        `Unsupported file format: ${ext}. Supported formats are: ${Object.keys(
-          DEEPL_SUPPORTED_FORMATS,
-        ).join(', ')}`,
-      );
-    }
-
     const stats = fs.statSync(filePath);
-    if (stats.size > FILE_SIZE_LIMITS[ext]) {
+    if (stats.size > (FILE_SIZE_LIMITS[ext] ?? 50 * 1024 * 1024)) {
       throw new FileValidationError(
         `File size exceeds limit of ${
           FILE_SIZE_LIMITS[ext] / (1024 * 1024)
@@ -131,6 +123,7 @@ export class DeepLTranslator {
       );
       return response.data;
     } catch (error) {
+      console.log(error);
       throw new TranslationError(`Upload failed: ${error.message}`);
     }
   }
@@ -189,18 +182,17 @@ export class DeepLTranslator {
         targetLang,
         formality,
       );
-      console.log('uploadResult');
-      console.dir(uploadResult, { depth: Infinity });
 
       let status: StatusResponse;
+
       do {
         status = await this.checkStatus(
           uploadResult.document_id,
           uploadResult.document_key,
         );
-        console.log('status');
-        console.dir(status, { depth: Infinity });
+
         if (status.status === 'error') {
+          console.log(status);
           throw new TranslationError(
             status.error_message || 'Unknown error during translation',
           );

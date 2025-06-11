@@ -1,5 +1,184 @@
-import { Card } from '../Card';
-import { Download } from '../Download';
+import { useState } from 'react';
+import LanguageOption from './LanguageOption';
+import { GermanFlag, FrenchFlag, EnglishFlag, SpanishFlag } from './svg/flags';
+
+import styles from './styles';
+import { Select } from './Select';
+import { Upload } from './Upload';
+import { OTHERS } from './lib/others';
+import { Card } from './Card';
+import { LoadingCard } from './LoadingCard';
+import { Button } from './Button';
+
+function FormComponent() {
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [link, setLink] = useState<string>('');
+  const [selectedLanguage, setSelectedLanguage] = useState<string>('EN-GB');
+  const [tone, setTone] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [response, setResponse] = useState<File | null>(null);
+
+  // Handle form submission
+  const handleSubmit = async () => {
+    if (!selectedFile && !link) {
+      return;
+    }
+
+    setIsLoading(true);
+
+    await new Promise(resolve => setTimeout(resolve, 5000));
+
+    setIsLoading(false);
+    setResponse(selectedFile);
+
+    // setIsLoading(true);
+
+    // const basePayload = {
+    //   lang: selectedLanguage,
+    //   formality: tone ?? 'default',
+    // };
+    // const payload = selectedFile
+    //   ? {
+    //       ...basePayload,
+    //       file: await new Promise(resolve => {
+    //         const reader = new FileReader();
+    //         reader.onloadend = () => resolve(reader.result);
+    //         reader.readAsDataURL(selectedFile);
+    //       }),
+    //     }
+    //   : { ...basePayload, link };
+
+    // const response = await api('/document', payload);
+
+    // setIsLoading(false);
+
+    // if (response.status === 'error') return;
+
+    // setResponse(new File([response.data], selectedFile?.name ?? ''));
+
+    // Simulate API call
+    // setTimeout(() => {
+    //   console.log('File:', selectedFile);
+    //   console.log('Link:', link);
+    //   console.log('Language:', selectedLanguage);
+    //   console.log('Tone:', tone);
+    //   setIsLoading(false);
+    //   alert('Translation request submitted successfully!');
+    //   // Reset form
+    //   setSelectedFile(null);
+    //   setLink('');
+    // }, 2000);
+  };
+
+  const translateAnother = () => {
+    setSelectedFile(null);
+    setLink('');
+    setTone(null);
+    setResponse(null);
+  };
+
+  if (isLoading) return <LoadingCard />;
+
+  if (response)
+    return <ResponseCard file={response} translateAnother={translateAnother} />;
+
+  return (
+    <Card>
+      <Upload
+        onChange={setSelectedFile}
+        value={selectedFile}
+        link={link}
+        setLink={setLink}
+      />
+
+      <div style={styles.sectionContainer}>
+        <div style={styles.sectionBox}>
+          <div style={styles.sectionTitle}>
+            <p style={styles.sectionTitleText}>Translate to</p>
+          </div>
+
+          <div style={styles.languageOptionsContainer}>
+            <div style={styles.languageOptionsBox}>
+              <LanguageOption
+                language="German"
+                flag={<GermanFlag />}
+                isSelected={selectedLanguage === 'DE'}
+                onClick={() => setSelectedLanguage('DE')}
+              />
+
+              <LanguageOption
+                language="French"
+                flag={<FrenchFlag />}
+                isSelected={selectedLanguage === 'FR'}
+                onClick={() => setSelectedLanguage('FR')}
+              />
+
+              <LanguageOption
+                language="English"
+                flag={<EnglishFlag />}
+                isSelected={selectedLanguage === 'EN-GB'}
+                onClick={() => setSelectedLanguage('EN-GB')}
+              />
+
+              <LanguageOption
+                language="Spanish"
+                flag={<SpanishFlag />}
+                isSelected={selectedLanguage === 'ES'}
+                onClick={() => setSelectedLanguage('ES')}
+              />
+
+              <Select
+                placeholder="Other"
+                options={OTHERS}
+                value={selectedLanguage}
+                onChange={v => setSelectedLanguage(v!)}
+                style={{ width: 'auto', flex: 1 }}
+              />
+            </div>
+          </div>
+
+          <Select
+            onChange={setTone}
+            options={[
+              { label: 'Not specified', value: null },
+              { label: 'Informal', value: 'prefer_less' },
+              { label: 'Formal', value: 'prefer_more' },
+            ]}
+            placeholder="Select tone"
+            value={tone}
+          />
+        </div>
+      </div>
+
+      <Button
+        disabled={isLoading || (!selectedFile && !link)}
+        size="large"
+        onClick={handleSubmit}
+      >
+        {isLoading ? 'Translating...' : 'Translate'}
+      </Button>
+      <div id="portal"></div>
+    </Card>
+  );
+}
+
+export default function Form() {
+  return (
+    <div className="__entry">
+      <style>
+        {`
+        .__entry * {
+          box-sizing: border-box;
+          margin: 0;
+          padding: 0;
+          font-family: 'Suisse Intl';
+        }
+      `}
+      </style>
+      <FormComponent />
+    </div>
+  );
+}
 
 export const ResponseCard = ({
   file,
@@ -224,4 +403,140 @@ export const ResponseCard = ({
       </div>
     </Card>
   );
+};
+
+export const Download = ({ value }: { value: File | null }) => {
+  const downloadFile = () => {
+    if (!value) return;
+
+    const obj = new Blob([value], { type: value?.type });
+
+    const link = document.createElement('a');
+
+    link.href = URL.createObjectURL(obj);
+    link.download = value.name;
+    link.click();
+    link.remove();
+  };
+
+  if (!value) return null;
+
+  return (
+    <div
+      style={{ ...styles.sectionContainer, cursor: 'pointer', maxWidth: 427 }}
+      onClick={downloadFile}
+    >
+      <div style={styles.sectionBox}>
+        <div style={styles.uploadedFileContainer}>
+          <div style={styles.uploadedFileContent}>
+            <div style={styles.uploadedFileIcon}>
+              <svg
+                width="36"
+                height="36"
+                viewBox="0 0 36 36"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <circle cx="18" cy="18" r="18" fill="#F5F5FF" />
+                <circle cx="18" cy="18" r="14" fill="#E7E7FC" />
+                <path
+                  d="M19.3337 11.5126V14.2663C19.3337 14.6397 19.3337 14.8264 19.4063 14.969C19.4702 15.0944 19.5722 15.1964 19.6977 15.2603C19.8403 15.333 20.027 15.333 20.4003 15.333H23.154M23.3337 16.6585V21.4663C23.3337 22.5864 23.3337 23.1465 23.1157 23.5743C22.9239 23.9506 22.618 24.2566 22.2416 24.4484C21.8138 24.6663 21.2538 24.6663 20.1337 24.6663H15.867C14.7469 24.6663 14.1868 24.6663 13.759 24.4484C13.3827 24.2566 13.0767 23.9506 12.885 23.5743C12.667 23.1465 12.667 22.5864 12.667 21.4663V14.533C12.667 13.4129 12.667 12.8529 12.885 12.425C13.0767 12.0487 13.3827 11.7427 13.759 11.551C14.1868 11.333 14.7469 11.333 15.867 11.333H18.0082C18.4974 11.333 18.7419 11.333 18.9721 11.3883C19.1762 11.4373 19.3713 11.5181 19.5502 11.6277C19.7521 11.7514 19.925 11.9244 20.2709 12.2703L22.3964 14.3957C22.7423 14.7417 22.9153 14.9146 23.0389 15.1164C23.1486 15.2954 23.2294 15.4905 23.2784 15.6945C23.3337 15.9247 23.3337 16.1693 23.3337 16.6585Z"
+                  stroke="#0B0BCF"
+                  stroke-width="1.33"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
+            </div>
+            <div style={styles.uploadedFileInfo}>
+              <p style={styles.uploadedFileName}>{value.name}</p>
+              <p style={styles.uploadedFileSize}>
+                {(() => {
+                  const units = ['B', 'KB', 'MB', 'GB', 'TB'];
+                  let size = value.size;
+                  let unitIndex = 0;
+
+                  while (size >= 1024 && unitIndex < units.length - 1) {
+                    size /= 1024;
+                    unitIndex++;
+                  }
+
+                  return `${Math.round(size * 100) / 100} ${units[unitIndex]}`;
+                })()}
+              </p>
+            </div>
+          </div>
+          <button style={styles.uploadedFileRemove}>
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 20 20"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M17.5 17.5H2.5M15 9.16667L10 14.1667M10 14.1667L5 9.16667M10 14.1667V2.5"
+                stroke="#667085"
+                stroke-width="1.66667"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export const Button = ({
+  children,
+  disabled,
+  size = 'large',
+  styles: propStyles,
+  onClick,
+}: PropsWithChildren<{
+  disabled?: boolean;
+  size?: 'small' | 'large';
+  styles?: CSSProperties;
+  onClick?: () => void;
+}>) => {
+  return (
+    <button
+      style={{ ...buttonStyles.button(Boolean(disabled), size), ...propStyles }}
+      disabled={disabled}
+      onClick={onClick}
+    >
+      {children}
+    </button>
+  );
+};
+
+const buttonStyles = {
+  button: (isDisabled: boolean, size: 'small' | 'large') =>
+    ({
+      position: 'relative',
+      borderRadius: '16px',
+      boxShadow: '0px 1px 2px 0px rgba(20,21,26,0.05)',
+      flexShrink: 0,
+      width: '100%',
+      backgroundColor: isDisabled ? '#d1d1fa' : '#0000ff',
+      cursor: isDisabled ? 'default' : 'pointer',
+      display: 'flex',
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      overflow: 'clip',
+      height: '100%',
+      fontFamily: "'Suisse Intl', sans-serif",
+      fontWeight: 450,
+      lineHeight: '24px',
+      color: '#ffffff',
+      fontSize: size === 'small' ? '16px' : '20px',
+      textAlign: 'center',
+      whiteSpace: 'pre',
+      letterSpacing: '-0.4px',
+      padding: size === 'small' ? '12px 16px' : '18px 16px',
+      border: 'none',
+    } as CSSProperties),
 };
