@@ -253,14 +253,14 @@ export const GreekFlag = () => {
         >
           <rect width="22" height="16" rx="2" fill="#F2F4F7" />
           <path
-            fill-rule="evenodd"
-            clip-rule="evenodd"
+            fillRule="evenodd"
+            clipRule="evenodd"
             d="M0 0H4.19048V4.26667H0V0ZM6.28571 0H10.4762V4.26667H6.28571V0ZM0 6.4H4.19048V10.6667H0V6.4ZM6.28571 6.4H10.4762V10.6667H6.28571V6.4ZM10.4762 0H22V2.13333H10.4762V0ZM10.4762 4.26667H22V6.4H10.4762V4.26667Z"
             fill="#1A47B8"
           />
           <path
-            fill-rule="evenodd"
-            clip-rule="evenodd"
+            fillRule="evenodd"
+            clipRule="evenodd"
             d="M0 8.5332H22V10.6665H0V8.5332ZM4.19048 8.5332H6.28571V10.6665H4.19048V8.5332ZM0 12.7999H22V14.9332H0V12.7999Z"
             fill="#1A47B8"
           />
@@ -283,8 +283,8 @@ export const IsralianFlag = () => {
         >
           <rect width="22" height="16" rx="2" fill="#F2F4F7" />
           <path
-            fill-rule="evenodd"
-            clip-rule="evenodd"
+            fillRule="evenodd"
+            clipRule="evenodd"
             d="M0 11.7338H22V13.8671H0V11.7338ZM0 2.13379H22V4.26712H0V2.13379ZM10.3452 9.60046H8.38095L9.36362 8.00046L8.38095 6.40046H10.3452L11 5.33379L11.6548 6.40046H13.619L12.6364 8.00046L13.619 9.60046H11.6548L11 10.6671L10.3452 9.60046ZM9.95238 8.00046L11 6.93379L12.0476 8.00046L11 9.06712L9.95238 8.00046Z"
             fill="#1A47B8"
           />
@@ -305,17 +305,17 @@ export const NorwegianFlag = () => {
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
         >
-          <g clip-path="url(#clip0_2132_5583)">
+          <g clipPath="url(#clip0_2132_5583)">
             <rect width="22" height="16" rx="2" fill="#AF010D" />
             <path
-              fill-rule="evenodd"
-              clip-rule="evenodd"
+              fillRule="evenodd"
+              clipRule="evenodd"
               d="M6.28571 9.6H0V6.4H6.28571V0H9.42857V6.4H22V9.6H9.42857V16H6.28571V9.6Z"
               fill="#F2F4F7"
             />
             <path
-              fill-rule="evenodd"
-              clip-rule="evenodd"
+              fillRule="evenodd"
+              clipRule="evenodd"
               d="M7.33333 8.53333H0V7.46667H7.33333V0H8.38095V7.46667H22V8.53333H8.38095V16H7.33333V8.53333Z"
               fill="#1A47B8"
             />
@@ -344,14 +344,14 @@ export const TurkishFlag = () => {
         >
           <rect width="22" height="16" rx="2" fill="#D80027" />
           <path
-            fill-rule="evenodd"
-            clip-rule="evenodd"
+            fillRule="evenodd"
+            clipRule="evenodd"
             d="M14.6687 9.22916L13.4514 9.87983L13.684 8.50063L12.6992 7.5225L14.0611 7.31983L14.6687 6.06543L15.2764 7.3209L16.6383 7.52356L15.6535 8.49956L15.8861 9.87876"
             fill="#F2F4F7"
           />
           <path
-            fill-rule="evenodd"
-            clip-rule="evenodd"
+            fillRule="evenodd"
+            clipRule="evenodd"
             d="M9.95182 11.7333C11.9769 11.7333 13.6185 10.0618 13.6185 7.99994C13.6185 5.93807 11.9769 4.2666 9.95182 4.2666C7.92678 4.2666 6.28516 5.93807 6.28516 7.99994C6.28516 10.0618 7.92678 11.7333 9.95182 11.7333ZM10.9994 10.6666C12.4452 10.6666 13.6185 9.47194 13.6185 7.99994C13.6185 6.52794 12.4452 5.33327 10.9994 5.33327C9.55373 5.33327 8.38039 6.52794 8.38039 7.99994C8.38039 9.47194 9.55373 10.6666 10.9994 10.6666Z"
             fill="#F2F4F7"
           />
