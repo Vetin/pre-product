@@ -21,7 +21,7 @@ const ORIGINS = [
 new Elysia()
   .use(
     cors({
-      origin: '*',
+      origin: ctx => ORIGINS.some(o => ctx.url.startsWith(o)),
       methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
       credentials: true,
     }),
