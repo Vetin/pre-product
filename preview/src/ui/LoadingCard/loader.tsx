@@ -24,7 +24,7 @@ export const Loader = () => (
         }
       `}
     </style>
-    <g clip-path="url(#clip0_1934_49750)">
+    <g clipPath="url(#clip0_1934_49750)">
       <path
         opacity="0.4"
         d="M20 10C20 15.5228 15.5228 20 10 20C4.47715 20 0 15.5228 0 10C0 4.47715 4.47715 0 10 0C15.5228 0 20 4.47715 20 10ZM2.48393 10C2.48393 14.151 5.84899 17.5161 10 17.5161C14.151 17.5161 17.5161 14.151 17.5161 10C17.5161 5.84899 14.151 2.48393 10 2.48393C5.84899 2.48393 2.48393 5.84899 2.48393 10Z"
@@ -44,8 +44,8 @@ export const Loader = () => (
         gradientUnits="userSpaceOnUse"
         gradientTransform="translate(6.58537 2.68293) rotate(20.556) scale(20.839)"
       >
-        <stop stop-color="#1317FF" />
-        <stop offset="1" stop-color="#1317FF" stop-opacity="0" />
+        <stop stopColor="#1317FF" />
+        <stop offset="1" stopColor="#1317FF" stopOpacity="0" />
       </radialGradient>
       <clipPath id="clip0_1934_49750">
         <rect width="20" height="20" fill="white" />

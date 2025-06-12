@@ -163,9 +163,9 @@ export const Select = ({
                 <path
                   d="M16.6654 5L7.4987 14.1667L3.33203 10"
                   stroke="#0B0BCF"
-                  stroke-width="1.66667"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
+                  strokeWidth="1.66667"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
                 />
               </svg>
             )}

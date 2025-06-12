@@ -21,7 +21,7 @@ const ORIGINS = [
 new Elysia()
   .use(
     cors({
-      origin: ORIGINS,
+      origin: '*',
       methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
       credentials: true,
     }),
@@ -35,6 +35,9 @@ new Elysia()
           message: 'Invalid origin',
         };
       }
+
+      console.log('Start processing request');
+      console.dir(body, { depth: Infinity });
 
       const { lang, formality } = body;
 

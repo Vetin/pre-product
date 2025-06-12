@@ -315,8 +315,8 @@ const ResponseCard = ({
               whiteSpace: 'pre',
             }}
           >
-            Translate your videos{'\n'}and audio into any{'\n'}language{' '}
-            <span style={{ fontStyle: 'italic' }}>with Rask AI</span>
+            Translate your videos{'\n'}and audio into any{'\n'}
+            language <span style={{ fontStyle: 'italic' }}>with Rask AI</span>
           </p>
           <p
             style={{
@@ -508,7 +508,10 @@ const Button = ({
 }>) => {
   return (
     <button
-      style={{ ...buttonStyles.button(Boolean(disabled), size), ...propStyles }}
+      style={{
+        ...buttonStyles.button(Boolean(disabled), size),
+        ...propStyles,
+      }}
       disabled={disabled}
       onClick={onClick}
     >
@@ -2568,7 +2571,12 @@ const featuresData = [
     content: (
       <>
         <div style={featuresStyles.featureB}>
-          <img style={{ width: '100%' }} width="121" height="111" src="" />
+          <img
+            style={{ width: '100%' }}
+            width="121"
+            height="111"
+            src="https://framerusercontent.com/images/qJHpVTV3n1MLBF7TlpNSz1qtYCQ.png"
+          />
 
           <div style={featuresStyles.featureBContent}>
             <div
@@ -2580,7 +2588,12 @@ const featuresData = [
               }}
             >
               <p style={featuresStyles.featureBContentTitle}>Without AI</p>
-              <div style={{ display: 'flex', flexDirection: 'column' }}>
+              <div
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                }}
+              >
                 <p style={featuresStyles.featureBContentText}>
                   ❌ Expensive Localization
                 </p>
@@ -2595,7 +2608,12 @@ const featuresData = [
           </div>
         </div>
         <div style={featuresStyles.featureB}>
-          <img style={{ width: '100%' }} width="121" height="111" src="" />
+          <img
+            style={{ width: '100%' }}
+            width="121"
+            height="111"
+            src="https://framerusercontent.com/images/LERyzF0zetKy2H3WdAfeP4HfAU0.png"
+          />
           <div style={featuresStyles.featureBContent}>
             <div
               style={{
@@ -2606,7 +2624,12 @@ const featuresData = [
               }}
             >
               <p style={featuresStyles.featureBContentTitle}>Without AI</p>
-              <div style={{ display: 'flex', flexDirection: 'column' }}>
+              <div
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                }}
+              >
                 <p style={featuresStyles.featureBContentText}>
                   ✅ Low-Cost AI Translation
                 </p>
@@ -3105,7 +3128,13 @@ const featuresData = [
                 </defs>
               </svg>
             </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 4,
+              }}
+            >
               <p
                 style={{
                   color: '#14151A',
@@ -3152,7 +3181,12 @@ const featuresData = [
                 style={{ borderRadius: 150 }}
               />
 
-              <div style={{ display: 'flex', flexDirection: 'column' }}>
+              <div
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                }}
+              >
                 <p
                   style={{
                     color: '#14151A',
