@@ -79,7 +79,7 @@ export class DeepLTranslator {
     const ext = path.extname(filePath).toLowerCase().replace('.', '');
 
     const stats = fs.statSync(filePath);
-    if (stats.size > (FILE_SIZE_LIMITS[ext] ?? 50 * 1024 * 1024)) {
+    if (stats.size > 10 * 1024 * 1024) {
       throw new FileValidationError(
         `File size exceeds limit of ${
           FILE_SIZE_LIMITS[ext] / (1024 * 1024)
