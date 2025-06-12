@@ -81,9 +81,7 @@ export class DeepLTranslator {
     const stats = fs.statSync(filePath);
     if (stats.size > 10 * 1024 * 1024) {
       throw new FileValidationError(
-        `File size exceeds limit of ${
-          FILE_SIZE_LIMITS[ext] / (1024 * 1024)
-        }MB for ${ext} files`,
+        `File size exceeds limit of ${10 * 1024 * 1024}MB`,
       );
     }
   }
