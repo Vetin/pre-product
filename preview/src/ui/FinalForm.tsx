@@ -98,6 +98,13 @@ function FormComponent() {
           <div style={uploadStyles.languageOptionsContainer}>
             <div style={uploadStyles.languageOptionsBox}>
               <LanguageOption
+                language="English"
+                flag={<EnglishFlag />}
+                isSelected={selectedLanguage === 'EN-GB'}
+                onClick={() => setSelectedLanguage('EN-GB')}
+              />
+
+              <LanguageOption
                 language="German"
                 flag={<GermanFlag />}
                 isSelected={selectedLanguage === 'DE'}
@@ -109,13 +116,6 @@ function FormComponent() {
                 flag={<FrenchFlag />}
                 isSelected={selectedLanguage === 'FR'}
                 onClick={() => setSelectedLanguage('FR')}
-              />
-
-              <LanguageOption
-                language="English"
-                flag={<EnglishFlag />}
-                isSelected={selectedLanguage === 'EN-GB'}
-                onClick={() => setSelectedLanguage('EN-GB')}
               />
 
               <LanguageOption
@@ -354,6 +354,7 @@ const ResponseCard = ({
               lineHeight: '24px',
               letterSpacing: '-0.28px',
               border: 'none',
+              textDecoration: 'none',
             }}
           >
             Try it free
@@ -500,14 +501,18 @@ const Button = ({
   size = 'large',
   styles: propStyles,
   onClick,
+  href,
 }: PropsWithChildren<{
   disabled?: boolean;
   size?: 'small' | 'large';
   styles?: CSSProperties;
   onClick?: () => void;
+  href?: string;
 }>) => {
+  const Tag = href ? 'a' : 'button';
   return (
-    <button
+    <Tag
+      href={href}
       style={{
         ...buttonStyles.button(Boolean(disabled), size),
         ...propStyles,
@@ -516,13 +521,14 @@ const Button = ({
       onClick={onClick}
     >
       {children}
-    </button>
+    </Tag>
   );
 };
 
 const buttonStyles = {
   button: (isDisabled: boolean, size: 'small' | 'large') =>
     ({
+      textDecoration: 'none',
       position: 'relative',
       borderRadius: '16px',
       boxShadow: '0px 1px 2px 0px rgba(20,21,26,0.05)',
@@ -2249,8 +2255,8 @@ const Select = ({
   );
 };
 
-// const BASE_URL = 'https://pre-product.onrender.com';
-const BASE_URL = 'http://localhost:3000';
+const BASE_URL = 'https://pre-product.onrender.com';
+// const BASE_URL = "http://localhost:3000"
 
 const api = async (url: string, body: unknown) => {
   const response = await fetch(`${BASE_URL}${url}`, {
