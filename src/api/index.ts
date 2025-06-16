@@ -22,7 +22,7 @@ const ORIGINS = [
 new Elysia()
   .use(
     cors({
-      origin: '*',
+      origin: ORIGINS,
       methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
       credentials: true,
     }),
@@ -30,13 +30,6 @@ new Elysia()
   .post(
     '/document',
     async ({ body, request }) => {
-      if (!ORIGINS.includes(request.headers.get('origin') ?? '')) {
-        return {
-          status: 'error',
-          message: 'Invalid origin',
-        };
-      }
-
       console.log('Start processing request');
       console.dir(body, { depth: Infinity });
 
