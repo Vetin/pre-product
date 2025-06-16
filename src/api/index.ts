@@ -16,6 +16,7 @@ const translator = new DeepLTranslator(Bun.env.DEEPL_API_KEY);
 const ORIGINS = [
   'http://localhost:5174',
   'https://rask.ai',
+  'https://www.rask.ai',
   'https://excellent-lifecycle-679985.framer.app',
 ];
 new Elysia()
