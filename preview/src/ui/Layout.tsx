@@ -11,156 +11,27 @@ import {
   type PropsWithChildren,
 } from 'react';
 
-function FormComponent() {
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [link, setLink] = useState<string>('');
-  const [selectedLanguage, setSelectedLanguage] = useState<string>('EN-GB');
-  const [tone, setTone] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [response, setResponse] = useState<File | null>(null);
+type Props = {
+  isLoading: boolean;
+  response: File | null;
+  translateAnother: () => void;
+};
 
-  // Handle form submission
-  const handleSubmit = async () => {
-    if (!selectedFile && !link) {
-      return;
-    }
-
-    setIsLoading(true);
-
-    const basePayload = {
-      lang: selectedLanguage,
-      formality: tone ?? 'default',
-    };
-    const payload = selectedFile
-      ? {
-          ...basePayload,
-          file: await new Promise(resolve => {
-            const reader = new FileReader();
-            reader.onloadend = () => resolve(reader.result);
-            reader.readAsDataURL(selectedFile);
-          }),
-        }
-      : { ...basePayload, link };
-
-    const response = await api('/document', payload);
-
-    setIsLoading(false);
-
-    if (response.status === 'error') {
-      setIsLoading(false);
-      const method = 'link' in payload ? setLinkError : setFileError;
-      method(response.message ?? 'Unknown error');
-      return;
-    }
-
-    const bytes = Uint8Array.from(atob(response.data), c => c.charCodeAt(0));
-    const file = new File([bytes], selectedFile?.name ?? 'output.txt', {
-      type: selectedFile?.type ?? 'text/plain',
-    });
-
-    setResponse(file);
-  };
-
-  const translateAnother = () => {
-    setSelectedFile(null);
-    setLink('');
-    setTone(null);
-    setResponse(null);
-  };
-
-  const [fileError, setFileError] = useState<boolean | string>(false);
-  const [linkError, setLinkError] = useState<boolean | string>(false);
-
+function FormComponent({
+  children,
+  isLoading,
+  response,
+  translateAnother,
+}: PropsWithChildren<Props>) {
   if (isLoading) return <LoadingCard />;
 
   if (response)
     return <ResponseCard file={response} translateAnother={translateAnother} />;
 
-  return (
-    <Card>
-      <Upload
-        onChange={setSelectedFile}
-        value={selectedFile}
-        link={link}
-        setLink={setLink}
-        fileError={fileError}
-        setFileError={setFileError}
-        linkError={linkError}
-        setLinkError={setLinkError}
-      />
-
-      <div style={uploadStyles.sectionContainer}>
-        <div style={uploadStyles.sectionBox}>
-          <div style={uploadStyles.sectionTitle}>
-            <p style={uploadStyles.sectionTitleText}>Translate to</p>
-          </div>
-
-          <div style={uploadStyles.languageOptionsContainer}>
-            <div style={uploadStyles.languageOptionsBox}>
-              <LanguageOption
-                language="English"
-                flag={<EnglishFlag />}
-                isSelected={selectedLanguage === 'EN-GB'}
-                onClick={() => setSelectedLanguage('EN-GB')}
-              />
-
-              <LanguageOption
-                language="German"
-                flag={<GermanFlag />}
-                isSelected={selectedLanguage === 'DE'}
-                onClick={() => setSelectedLanguage('DE')}
-              />
-
-              <LanguageOption
-                language="French"
-                flag={<FrenchFlag />}
-                isSelected={selectedLanguage === 'FR'}
-                onClick={() => setSelectedLanguage('FR')}
-              />
-
-              <LanguageOption
-                language="Spanish"
-                flag={<SpanishFlag />}
-                isSelected={selectedLanguage === 'ES'}
-                onClick={() => setSelectedLanguage('ES')}
-              />
-
-              <Select
-                placeholder="Other"
-                options={OTHERS}
-                value={selectedLanguage}
-                onChange={v => setSelectedLanguage(v!)}
-                style={{ width: 'auto', flex: 1 }}
-              />
-            </div>
-          </div>
-
-          <Select
-            onChange={setTone}
-            options={[
-              { label: 'Not specified', value: null },
-              { label: 'Informal', value: 'prefer_less' },
-              { label: 'Formal', value: 'prefer_more' },
-            ]}
-            placeholder="Select tone"
-            value={tone}
-          />
-        </div>
-      </div>
-
-      <Button
-        disabled={isLoading || (!selectedFile && !link)}
-        size="large"
-        onClick={handleSubmit}
-      >
-        {isLoading ? 'Translating...' : 'Translate'}
-      </Button>
-      <div id="portal"></div>
-    </Card>
-  );
+  return <>{children}</>;
 }
 
-export default function Form() {
+export default function Form({ children, ...rest }: PropsWithChildren<Props>) {
   return (
     <div className="__entry">
       <style>
@@ -173,7 +44,8 @@ export default function Form() {
         }
       `}
       </style>
-      <FormComponent />
+      <FormComponent {...rest}>{children}</FormComponent>
+      <div id="portal"></div>
     </div>
   );
 }
@@ -495,7 +367,7 @@ const Download = ({ value }: { value: File | null }) => {
   );
 };
 
-const Button = ({
+export const Button = ({
   children,
   disabled,
   size = 'large',
@@ -682,7 +554,7 @@ const Loader = () => (
   </svg>
 );
 
-const Card = ({
+export const Card = ({
   children,
   styles: propStyles,
 }: {
@@ -720,7 +592,7 @@ const SUPPORTED_FILE_TYPES = [
   '.txt',
 ];
 
-const uploadStyles = {
+export const uploadStyles = {
   container: {
     backgroundColor: '#ffffff',
     position: 'relative',
@@ -757,7 +629,7 @@ const uploadStyles = {
     boxSizing: 'border-box',
     display: 'flex',
     flexDirection: 'column',
-    gap: '12px',
+    gap: '8px',
     alignItems: 'flex-start',
     justifyContent: 'flex-start',
     padding: 0,
@@ -783,8 +655,9 @@ const uploadStyles = {
   sectionTitleText: {
     display: 'block',
     lineHeight: 1.3,
-
     fontSize: '24px',
+    letterSpacing: '-0.72px',
+    color: '#000',
     margin: 0,
   } as CSSProperties,
   dragDropArea: (dragActive: boolean, invalid: boolean) =>
@@ -792,7 +665,7 @@ const uploadStyles = {
       position: 'relative',
       flexShrink: 0,
       width: '100%',
-      backgroundColor: dragActive ? '#f5f5ff' : 'transparent',
+      backgroundColor: '#f5f5ff',
       height: '200px',
       borderRadius: '16px',
       border: '1px dashed',
@@ -826,7 +699,7 @@ const uploadStyles = {
     position: 'relative',
     flexShrink: 0,
     color: '#3d3de9',
-    fontSize: '14px',
+    fontSize: '16px',
     textAlign: 'center',
     whiteSpace: 'nowrap',
   } as CSSProperties,
@@ -842,8 +715,7 @@ const uploadStyles = {
     boxShadow: '0px 1px 2px 0px rgba(20,21,26,0.05)',
     flexShrink: 0,
     backgroundColor: '#0000ff',
-    width: '100%',
-    maxWidth: 220,
+    width: 'fit-content',
     cursor: 'pointer',
   } as CSSProperties,
   uploadButtonContainer: {
@@ -895,7 +767,7 @@ const uploadStyles = {
     position: 'relative',
     flexShrink: 0,
     color: '#3d3de9',
-    fontSize: '14px',
+    fontSize: '16px',
     textAlign: 'center',
     whiteSpace: 'nowrap',
   } as CSSProperties,
@@ -1272,7 +1144,7 @@ const uploadStyles = {
   } as CSSProperties,
 };
 
-const Upload = ({
+export const Upload = ({
   onChange,
   value,
   link,
@@ -1366,7 +1238,26 @@ const Upload = ({
       <div style={uploadStyles.sectionContainer}>
         <div style={uploadStyles.sectionBox}>
           <div style={uploadStyles.sectionTitle}>
-            <p style={uploadStyles.sectionTitleText}>Upload file</p>
+            <style>
+              {`
+                .__section-title {
+                  color: #000;
+                  font-size: 24px;
+                  font-weight: 400;
+                  line-height: 130%;
+                  letter-spacing: -0.72px;
+                }
+
+                @media screen and (max-width: 1024px) {
+                  .__section-title {
+                    font-size: 20px;
+                    line-height: 24px;
+                    letter-spacing: -0.4px;
+                  }
+                }
+              `}
+            </style>
+            <p className="__section-title">Upload file</p>
           </div>
 
           <div style={uploadStyles.uploadedFileContainer}>
@@ -1426,7 +1317,26 @@ const Upload = ({
     <div style={uploadStyles.sectionContainer}>
       <div style={uploadStyles.sectionBox}>
         <div style={uploadStyles.sectionTitle}>
-          <p style={uploadStyles.sectionTitleText}>Upload file</p>
+          <style>
+            {`
+                .__section-title {
+                  color: #000;
+                  font-size: 24px;
+                  font-weight: 400;
+                  line-height: 130%;
+                  letter-spacing: -0.72px;
+                }
+
+                @media screen and (max-width: 1024px) {
+                  .__section-title {
+                    font-size: 20px;
+                    line-height: 24px;
+                    letter-spacing: -0.4px;
+                  }
+                }
+              `}
+          </style>
+          <p className="__section-title">Upload file</p>
         </div>
 
         <div style={{ width: '100%' }}>
@@ -1445,7 +1355,15 @@ const Upload = ({
                   </p>
                 </div>
 
-                <div style={uploadStyles.uploadButton} onClick={openFileDialog}>
+                <Button
+                  size="small"
+                  onClick={openFileDialog}
+                  styles={{
+                    height: 'auto',
+                    width: 'fit-content',
+                    padding: '12px 32px',
+                  }}
+                >
                   <input
                     type="file"
                     ref={fileInputRef}
@@ -1453,16 +1371,8 @@ const Upload = ({
                     style={{ display: 'none' }}
                     accept=".pdf,.doc,.docx,.ppt,.pptx,.ai,.txt"
                   />
-                  <div style={uploadStyles.uploadButtonContainer}>
-                    <div style={uploadStyles.uploadButtonBox}>
-                      <div style={uploadStyles.uploadButtonText}>
-                        <p style={uploadStyles.uploadButtonTextP}>
-                          Upload a file
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                  Upload a file
+                </Button>
 
                 <div style={uploadStyles.fileTypeText}>
                   <p style={uploadStyles.fileTypeTextP}>
@@ -1511,7 +1421,7 @@ const FormatError = ({ message }: { message: string | boolean }) => (
   </p>
 );
 
-const GermanFlag = () => {
+export const GermanFlag = () => {
   return (
     <div>
       <div>
@@ -1551,7 +1461,7 @@ const GermanFlag = () => {
   );
 };
 
-const FrenchFlag = () => {
+export const FrenchFlag = () => {
   return (
     <div className="flag-container">
       <div className="flag-box">
@@ -1591,7 +1501,7 @@ const FrenchFlag = () => {
   );
 };
 
-const EnglishFlag = () => {
+export const EnglishFlag = () => {
   return (
     <div className="english-flag-container">
       <div className="english-flag-inner">
@@ -1643,7 +1553,7 @@ const EnglishFlag = () => {
   );
 };
 
-const SpanishFlag = () => {
+export const SpanishFlag = () => {
   return (
     <div className="english-flag-container">
       <div className="english-flag-inner">
@@ -1892,7 +1802,7 @@ const LANGS = [
   },
 ];
 
-const OTHERS = LANGS.map(lang => ({
+export const OTHERS = LANGS.map(lang => ({
   label: (
     <div
       style={{
@@ -1914,7 +1824,7 @@ const OTHERS = LANGS.map(lang => ({
   value: lang.value ?? lang.code,
 }));
 
-const LanguageOption = ({
+export const LanguageOption = ({
   language,
   flag,
   isSelected,
@@ -2006,14 +1916,16 @@ interface SelectProps {
   onChange: (value: string | null) => void;
   placeholder?: string;
   style?: React.CSSProperties;
+  className?: string;
 }
 
-const Select = ({
+export const Select = ({
   options,
   value,
   onChange,
   placeholder = 'Select option',
   style,
+  className,
 }: SelectProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [hoveredOptionValue, setHoveredOptionValue] = useState<string | null>(
@@ -2182,6 +2094,7 @@ const Select = ({
         width: '100%',
         ...style,
       }}
+      className={className}
     >
       <button
         onClick={handleToggle}
@@ -2255,6 +2168,27 @@ const api = async (url: string, body: unknown) => {
   }
 
   return response.json();
+};
+
+export const createApi = (BASE_URL: string) => {
+  return async (url: string, body: unknown) => {
+    const response = await fetch(`${BASE_URL}${url}`, {
+      method: 'POST',
+      body: JSON.stringify(body),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (response.status !== 200) {
+      return {
+        status: 'error',
+        message: 'Failed to translate',
+      };
+    }
+
+    return response.json();
+  };
 };
 
 type Language = 'German' | 'French' | 'English' | 'Spanish' | 'Other';
