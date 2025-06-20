@@ -10,7 +10,6 @@ import { rm } from 'fs/promises';
 
 import { writeFile } from 'fs/promises';
 import { fileTypeFromBuffer } from 'file-type';
-import { elevenLabs } from './11labs';
 
 const translator = new DeepLTranslator(Bun.env.DEEPL_API_KEY);
 
@@ -165,8 +164,18 @@ new Elysia()
         let cloudStorageUrl: string | undefined;
 
         if ('file' in body) {
-          const bytes = Buffer.from(body.file, 'base64');
-          file = new File([bytes], 'audio.mp3');
+          const match = body.file.match(/^data:([^;]+);base64,(.+)$/);
+
+          if (!match)
+            return {
+              status: 'error',
+              message: 'Invalid file',
+            };
+
+          const fileBuffer = Buffer.from(match[2], 'base64');
+          const fileExtension = await fileTypeFromBuffer(fileBuffer);
+
+          file = new File([fileBuffer], 'audio');
         }
         if ('link' in body) {
           cloudStorageUrl = body.link;
@@ -192,11 +201,14 @@ new Elysia()
           'https://api.elevenlabs.io/v1/speech-to-text',
           {
             method: 'POST',
+
             headers: {
-              Accept: 'application/json',
-              'xi-api-key': Bun.env.ELEVENLABS_API_KEY!,
-              'Content-Type': 'multipart/form-data',
+              'Xi-Api-Key':
+                'sk_86274ee2d7fb0bd6b90ca325f8d817ff7b48f1d1c8e91971',
+
+              'Api-Key': 'xi-api-key',
             },
+
             body: formData,
           },
         );
@@ -205,7 +217,7 @@ new Elysia()
           additional_formats: [
             { content_type, content, is_base64_encoded, file_extension },
           ],
-        } = JSON.parse(await response.text());
+        } = await response.json();
 
         let base64;
 
@@ -222,7 +234,6 @@ new Elysia()
           fileExtension: file_extension,
         };
       } catch (error) {
-        console.log(error);
         return {
           success: false,
           error: error.message,

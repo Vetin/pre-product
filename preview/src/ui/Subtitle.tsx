@@ -49,13 +49,9 @@ export default function Subtitle() {
     }
 
     const bytes = Uint8Array.from(atob(response.base64), c => c.charCodeAt(0));
-    const file = new File(
-      [bytes],
-      selectedFile?.name ?? `subtitle.${response.fileExtension}`,
-      {
-        type: response.contentType,
-      },
-    );
+    const file = new File([bytes], `subtitle.${response.fileExtension}`, {
+      type: response.contentType,
+    });
 
     setResponse(file);
   };
@@ -139,6 +135,7 @@ export default function Subtitle() {
   );
 }
 
+// const BASE_URL = 'https://verbose-lamp-vq7v777gqvv39x4-3000.app.github.dev';
 const BASE_URL = 'https://pre-product.onrender.com';
 // const BASE_URL = 'http://localhost:3000';
 
