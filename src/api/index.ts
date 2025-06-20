@@ -172,7 +172,7 @@ new Elysia()
       }
 
       const formData = new FormData();
-      formData.append('model_id', 'scribe_v1_experimental');
+      formData.append('model_id', 'scribe_v1');
 
       if (file) {
         formData.append('file', file);
