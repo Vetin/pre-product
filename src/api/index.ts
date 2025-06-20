@@ -10,6 +10,7 @@ import { rm } from 'fs/promises';
 
 import { writeFile } from 'fs/promises';
 import { fileTypeFromBuffer } from 'file-type';
+import { elevenLabs } from './11labs';
 
 const translator = new DeepLTranslator(Bun.env.DEEPL_API_KEY);
 
@@ -156,6 +157,63 @@ new Elysia()
       ]),
     },
   )
+  .post(
+    '/subtitle',
+    async ({ body }) => {
+      let file: File | undefined;
+      let cloudStorageUrl: string | undefined;
+
+      if ('file' in body) {
+        const bytes = Buffer.from(body.file, 'base64');
+        file = new File([bytes], 'audio.mp3');
+      }
+      if ('link' in body) {
+        cloudStorageUrl = body.link;
+      }
+
+      const formData = new FormData();
+      formData.append('model_id', 'scribe_v1_experimental');
+
+      if (file) {
+        formData.append('file', file);
+      }
+      if (cloudStorageUrl) {
+        formData.append('cloud_storage_url', cloudStorageUrl);
+      }
+      formData.append(
+        'additional_formats',
+        JSON.stringify([{ format: body.format }]),
+      );
+
+      const response = await fetch(
+        'https://api.elevenlabs.io/v1/speech-to-text',
+        {
+          method: 'POST',
+          headers: {
+            'xi-api-key': Bun.env.ELEVENLABS_API_KEY!,
+          },
+          body: formData,
+        },
+      );
+
+      console.log(await response.json());
+    },
+    {
+      body: t.Union([
+        t.Object({
+          file: t.String(),
+          format: t.Union([t.Literal('srt'), t.Literal('txt')]),
+        }),
+        t.Object({
+          link: t.String(),
+          format: t.Union([t.Literal('srt'), t.Literal('txt')]),
+        }),
+      ]),
+    },
+  )
+  .onError(({ error }) => {
+    console.log(error);
+  })
   .listen(3000, () => {
     console.log('Server is running on http://localhost:3000');
   });

@@ -82,6 +82,7 @@ export default function Document() {
     >
       <Card>
         <Upload
+          accept={ACCEPT}
           onChange={setSelectedFile}
           value={selectedFile}
           link={link}
@@ -176,3 +177,5 @@ const BASE_URL = 'https://pre-product.onrender.com';
 // const BASE_URL = "http://localhost:3000"
 
 const api = createApi(BASE_URL);
+
+const ACCEPT = ['.pdf', '.doc', '.docx', '.ppt', '.pptx', '.ai', '.txt'];

@@ -374,19 +374,21 @@ export const Button = ({
   styles: propStyles,
   onClick,
   href,
+  variant = 'primary',
 }: PropsWithChildren<{
   disabled?: boolean;
   size?: 'small' | 'large';
   styles?: CSSProperties;
   onClick?: () => void;
   href?: string;
+  variant?: 'primary' | 'outline';
 }>) => {
   const Tag = href ? 'a' : 'button';
   return (
     <Tag
       href={href}
       style={{
-        ...buttonStyles.button(Boolean(disabled), size),
+        ...buttonStyles.button(Boolean(disabled), size, variant),
         ...propStyles,
       }}
       disabled={disabled}
@@ -398,7 +400,11 @@ export const Button = ({
 };
 
 const buttonStyles = {
-  button: (isDisabled: boolean, size: 'small' | 'large') =>
+  button: (
+    isDisabled: boolean,
+    size: 'small' | 'large',
+    variant: 'primary' | 'outline',
+  ) =>
     ({
       textDecoration: 'none',
       position: 'relative',
@@ -406,7 +412,11 @@ const buttonStyles = {
       boxShadow: '0px 1px 2px 0px rgba(20,21,26,0.05)',
       flexShrink: 0,
       width: '100%',
-      backgroundColor: isDisabled ? '#d1d1fa' : '#0000ff',
+      backgroundColor: isDisabled
+        ? '#d1d1fa'
+        : variant === 'primary'
+        ? '#0000ff'
+        : '#ffffff',
       cursor: isDisabled ? 'default' : 'pointer',
       display: 'flex',
       flexDirection: 'row',
@@ -414,16 +424,16 @@ const buttonStyles = {
       justifyContent: 'center',
       overflow: 'clip',
       height: '100%',
+      border: variant === 'outline' ? '1px solid #D0D5DD' : 'none',
 
       fontWeight: 450,
       lineHeight: '24px',
-      color: '#ffffff',
+      color: variant === 'primary' ? '#ffffff' : '#000',
       fontSize: size === 'small' ? '16px' : '20px',
       textAlign: 'center',
       whiteSpace: 'pre',
       letterSpacing: '-0.4px',
       padding: size === 'small' ? '12px 16px' : '18px 16px',
-      border: 'none',
     } as CSSProperties),
 };
 
@@ -581,16 +591,6 @@ export const Card = ({
     </div>
   );
 };
-
-const SUPPORTED_FILE_TYPES = [
-  '.pdf',
-  '.doc',
-  '.docx',
-  '.ppt',
-  '.pptx',
-  '.ai',
-  '.txt',
-];
 
 export const uploadStyles = {
   container: {
@@ -1153,6 +1153,7 @@ export const Upload = ({
   setFileError,
   linkError,
   setLinkError,
+  accept,
 }: {
   onChange: (file: File | null) => void;
   value: File | null;
@@ -1163,10 +1164,14 @@ export const Upload = ({
   setFileError: (error: boolean | string) => void;
   linkError: boolean | string;
   setLinkError: (error: boolean | string) => void;
+  accept?: string[];
 }) => {
   const [dragActive, setDragActive] = useState<boolean>(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const supportedFormats = useMemo(() => {
+    return accept?.map(a => a.split('.').pop()?.toUpperCase()).join(', ') ?? '';
+  }, [accept]);
 
   const openFileDialog = () => {
     if (fileInputRef.current) {
@@ -1195,7 +1200,7 @@ export const Upload = ({
 
       const type = file.name.split('.').pop();
 
-      if (!SUPPORTED_FILE_TYPES.includes(`.${type}`)) {
+      if (!accept?.includes(`.${type}`)) {
         setFileError(true);
         return;
       }
@@ -1228,7 +1233,7 @@ export const Upload = ({
 
     if (!ext) return;
 
-    if (!SUPPORTED_FILE_TYPES.includes(`.${ext}`)) {
+    if (!accept?.includes(`.${ext}`)) {
       setLinkError(true);
     }
   };
@@ -1369,42 +1374,58 @@ export const Upload = ({
                     ref={fileInputRef}
                     onChange={handleFileChange}
                     style={{ display: 'none' }}
-                    accept=".pdf,.doc,.docx,.ppt,.pptx,.ai,.txt"
+                    accept={accept?.join(',')}
                   />
                   Upload a file
                 </Button>
 
                 <div style={uploadStyles.fileTypeText}>
-                  <p style={uploadStyles.fileTypeTextP}>
-                    PDF, DOC, DOCX, PPT, PPTX, AI.
-                  </p>
+                  <p style={uploadStyles.fileTypeTextP}>{supportedFormats}</p>
                 </div>
               </div>
             </div>
           </div>
-          {fileError && <FormatError message={fileError} />}
+          {fileError && (
+            <FormatError
+              message={fileError}
+              supportedFormats={supportedFormats}
+            />
+          )}
         </div>
 
-        <div style={uploadStyles.linkInput}>
-          <div style={uploadStyles.linkInputContainer}>
-            <div style={uploadStyles.linkInputBox}>
-              <CustomInput
-                style={uploadStyles.linkInputField}
-                placeholder="or Paste a link"
-                value={link}
-                onChange={onLinkChange}
-              />
+        <div style={{ width: '100%' }}>
+          <div style={uploadStyles.linkInput}>
+            <div style={uploadStyles.linkInputContainer}>
+              <div style={uploadStyles.linkInputBox}>
+                <CustomInput
+                  style={uploadStyles.linkInputField}
+                  placeholder="or Paste a link"
+                  value={link}
+                  onChange={onLinkChange}
+                />
+              </div>
             </div>
+            <div style={uploadStyles.linkInputBorder(Boolean(linkError))} />
           </div>
-          <div style={uploadStyles.linkInputBorder(Boolean(linkError))} />
-          {linkError && <FormatError message={linkError} />}
+          {linkError && (
+            <FormatError
+              message={linkError}
+              supportedFormats={supportedFormats}
+            />
+          )}
         </div>
       </div>
     </div>
   );
 };
 
-const FormatError = ({ message }: { message: string | boolean }) => (
+const FormatError = ({
+  message,
+  supportedFormats,
+}: {
+  message: string | boolean;
+  supportedFormats: string;
+}) => (
   <p
     style={{
       color: '#D92D20',
@@ -1417,7 +1438,7 @@ const FormatError = ({ message }: { message: string | boolean }) => (
   >
     {typeof message === 'string'
       ? message
-      : `File type not supported. Please upload one of the following types: PDF, DOC, DOCX, PPT, PPTX, AI.`}
+      : `File type not supported. Please upload one of the following types: ${supportedFormats}`}
   </p>
 );
 
