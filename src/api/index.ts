@@ -195,6 +195,7 @@ new Elysia()
             headers: {
               Accept: 'application/json',
               'xi-api-key': Bun.env.ELEVENLABS_API_KEY!,
+              'Content-Type': 'multipart/form-data',
             },
             body: formData,
           },
