@@ -221,6 +221,7 @@ new Elysia()
           fileExtension: file_extension,
         };
       } catch (error) {
+        console.log(error);
         return {
           success: false,
           error: error.message,
