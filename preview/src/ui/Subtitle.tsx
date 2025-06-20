@@ -48,10 +48,14 @@ export default function Subtitle() {
       return;
     }
 
-    const bytes = Uint8Array.from(atob(response.data), c => c.charCodeAt(0));
-    const file = new File([bytes], selectedFile?.name ?? 'output.txt', {
-      type: selectedFile?.type ?? 'text/plain',
-    });
+    const bytes = Uint8Array.from(atob(response.base64), c => c.charCodeAt(0));
+    const file = new File(
+      [bytes],
+      selectedFile?.name ?? `subtitle.${response.fileExtension}`,
+      {
+        type: response.contentType,
+      },
+    );
 
     setResponse(file);
   };

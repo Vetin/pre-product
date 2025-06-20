@@ -160,43 +160,71 @@ new Elysia()
   .post(
     '/subtitle',
     async ({ body }) => {
-      let file: File | undefined;
-      let cloudStorageUrl: string | undefined;
+      try {
+        let file: File | undefined;
+        let cloudStorageUrl: string | undefined;
 
-      if ('file' in body) {
-        const bytes = Buffer.from(body.file, 'base64');
-        file = new File([bytes], 'audio.mp3');
-      }
-      if ('link' in body) {
-        cloudStorageUrl = body.link;
-      }
+        if ('file' in body) {
+          const bytes = Buffer.from(body.file, 'base64');
+          file = new File([bytes], 'audio.mp3');
+        }
+        if ('link' in body) {
+          cloudStorageUrl = body.link;
+        }
 
-      const formData = new FormData();
-      formData.append('model_id', 'scribe_v1');
+        const formData = new FormData();
+        formData.append('model_id', 'scribe_v1');
 
-      if (file) {
-        formData.append('file', file);
-      }
-      if (cloudStorageUrl) {
-        formData.append('cloud_storage_url', cloudStorageUrl);
-      }
-      formData.append(
-        'additional_formats',
-        JSON.stringify([{ format: body.format }]),
-      );
+        if (file) {
+          formData.append('file', file);
+        }
+        if (cloudStorageUrl) {
+          formData.append('cloud_storage_url', cloudStorageUrl);
+        }
+        formData.append(
+          'additional_formats',
+          JSON.stringify([{ format: body.format }]),
+        );
+        formData.append('timestamps_granularity', 'word');
+        formData.append('diarize', 'true');
 
-      const response = await fetch(
-        'https://api.elevenlabs.io/v1/speech-to-text',
-        {
-          method: 'POST',
-          headers: {
-            'xi-api-key': Bun.env.ELEVENLABS_API_KEY!,
+        const response = await fetch(
+          'https://api.elevenlabs.io/v1/speech-to-text',
+          {
+            method: 'POST',
+            headers: {
+              'xi-api-key': Bun.env.ELEVENLABS_API_KEY!,
+            },
+            body: formData,
           },
-          body: formData,
-        },
-      );
+        );
 
-      console.log(await response.json());
+        const {
+          additional_formats: [
+            { content_type, content, is_base64_encoded, file_extension },
+          ],
+        } = await response.json();
+
+        let base64;
+
+        if (is_base64_encoded) {
+          base64 = content;
+        } else {
+          base64 = Buffer.from(content, 'utf8').toString('base64');
+        }
+
+        return {
+          base64,
+          contentType: content_type,
+          success: true,
+          fileExtension: file_extension,
+        };
+      } catch (error) {
+        return {
+          success: false,
+          error: error.message,
+        };
+      }
     },
     {
       body: t.Union([
