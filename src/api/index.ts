@@ -204,7 +204,7 @@ new Elysia()
           additional_formats: [
             { content_type, content, is_base64_encoded, file_extension },
           ],
-        } = await response.json();
+        } = JSON.parse(await response.text());
 
         let base64;
 
