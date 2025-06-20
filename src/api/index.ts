@@ -193,6 +193,7 @@ new Elysia()
           {
             method: 'POST',
             headers: {
+              Accept: 'application/json',
               'xi-api-key': Bun.env.ELEVENLABS_API_KEY!,
             },
             body: formData,
