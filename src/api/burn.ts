@@ -16,21 +16,17 @@ export async function addSubtitles(
   const output = join(temp, 'output.mp4');
 
   try {
-    // Write video file
     const videoBuffer = Buffer.from(videoBase64, 'base64');
     await Bun.write(input, videoBuffer);
     console.log(`📹 Video: ${videoBuffer.length} bytes`);
 
-    // Decode base64 SRT and convert to proper format
     const srtContent = Buffer.from(srtBase64, 'base64').toString('utf-8');
     const properSRT = convertToProperSRT(srtContent);
     await Bun.write(srt, properSRT);
     console.log('📝 SRT decoded and converted');
 
-    // Process video
     await processVideo(input, srt, output);
 
-    // Return result
     const result = await Bun.file(output).arrayBuffer();
     return Buffer.from(result).toString('base64');
   } finally {
@@ -38,9 +34,6 @@ export async function addSubtitles(
   }
 }
 
-/**
- * Convert your SRT format to proper standard SRT
- */
 function convertToProperSRT(srtContent: string): string {
   console.log('🔧 Converting SRT format...');
 
@@ -54,28 +47,19 @@ function convertToProperSRT(srtContent: string): string {
     .map((block, index) => {
       const lines = block.trim().split('\n');
 
-      // Find timing line (first line with -->)
       const timingLineIndex = lines.findIndex(line => line.includes('-->'));
       if (timingLineIndex === -1) return null;
 
-      // Extract timing and text
       let timingLine = lines[timingLineIndex];
       const textLines = lines.slice(timingLineIndex + 1);
 
-      // Clean timing line - remove speaker tags
       timingLine = timingLine.replace(/\s*\[speaker_\d+\].*$/, '').trim();
 
-      // Clean text lines - remove speaker tags if any
       const cleanTextLines = textLines
         .map(line => line.replace(/^\[speaker_\d+\]\s*/, '').trim())
         .filter(line => line);
 
-      // Build proper SRT block with sequence number
-      return [
-        (index + 1).toString(), // Sequence number
-        timingLine, // Clean timing
-        ...cleanTextLines, // Text content
-      ].join('\n');
+      return [(index + 1).toString(), timingLine, ...cleanTextLines].join('\n');
     })
     .filter(Boolean);
 
@@ -85,19 +69,14 @@ function convertToProperSRT(srtContent: string): string {
   return result;
 }
 
-/**
- * Process video with Cyrillic text support
- */
 async function processVideo(
   inputPath: string,
   srtPath: string,
   outputPath: string,
 ): Promise<void> {
   return new Promise((resolve, reject) => {
-    // Cross-platform path escaping
     const escapedSrtPath = srtPath.replace(/\\/g, '/');
 
-    // Subtitle filter with proper UTF-8 and Cyrillic support
     const subtitleFilter = `subtitles='${escapedSrtPath}':force_style='FontName=Arial,FontSize=18,PrimaryColour=&Hffffff,OutlineColour=&H000000,Outline=2,Shadow=1'`;
 
     ffmpeg(inputPath)
@@ -128,26 +107,4 @@ async function processVideo(
       })
       .run();
   });
-}
-
-/**
- * Debug function to test base64 SRT decoding
- */
-export function debugSRTBase64(srtBase64: string): any {
-  try {
-    const decoded = Buffer.from(srtBase64, 'base64').toString('utf-8');
-    const converted = convertToProperSRT(decoded);
-
-    return {
-      success: true,
-      original: decoded,
-      converted: converted,
-      subtitleCount: converted.split('\n\n').length,
-    };
-  } catch (error) {
-    return {
-      success: false,
-      error: error.message,
-    };
-  }
 }
