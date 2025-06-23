@@ -42,6 +42,13 @@ export default function Form({ children, ...rest }: PropsWithChildren<Props>) {
           padding: 0;
           font-family: "Suisse Intl Regular", "Suisse Intl Regular Placeholder", sans-serif;
         }
+        .__button[data-variant="primary"]:not(:disabled):hover {
+         background-color: #0B0BCF!important;
+        }
+         .__button[data-variant="outline"]:hover {
+         background-color: #FAFAFF!important;
+         }
+
       `}
       </style>
       <FormComponent {...rest}>{children}</FormComponent>
@@ -393,6 +400,8 @@ export const Button = ({
       }}
       disabled={disabled}
       onClick={onClick}
+      className="__button"
+      data-variant={variant}
     >
       {children}
     </Tag>

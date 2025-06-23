@@ -136,16 +136,16 @@ export default function Subtitle() {
 }
 
 //const BASE_URL = 'https://verbose-lamp-vq7v777gqvv39x4-3000.app.github.dev';
-//const BASE_URL = 'https://pre-product.onrender.com';
-const BASE_URL = 'http://localhost:3000';
+const BASE_URL = 'https://pre-product.onrender.com';
+//const BASE_URL = 'http://localhost:3000';
 
 const api = createApi(BASE_URL);
 
 const FORMATS = [
   { value: 'srt', label: 'SRT (universal subtitle format)' },
   { value: 'txt', label: 'TXT (plain text with timestamps)' },
-  { value: 'burn', label: 'Burn subtitles' },
-  // { value: 'json', label: 'JSON (JSON format)' },
+  { value: 'json', label: 'JSON (JSON format)' },
+  { value: 'burn', label: 'Burnt-in subtitles (hardcoded into video)' },
 ];
 
 const ACCEPT = ['.mp4', '.mov', '.webm', '.mkv', '.mp3', '.wav'];

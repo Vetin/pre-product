@@ -18,6 +18,7 @@ export const Button = ({
       style={{ ...buttonStyles.button(Boolean(disabled), size), ...propStyles }}
       disabled={disabled}
       onClick={onClick}
+      className="__button"
     >
       {children}
     </button>

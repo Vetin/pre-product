@@ -1,6 +1,6 @@
 import { useState, useRef, type ChangeEvent, type DragEvent } from 'react';
 import CustomInput from './CustomInput';
-import uploadStyles from './styles';
+import type { CSSProperties } from 'react';
 
 const SUPPORTED_FILE_TYPES = [
   '.pdf',
@@ -748,7 +748,10 @@ export const Upload = ({
                     style={{ display: 'none' }}
                     accept=".pdf,.doc,.docx,.ppt,.pptx,.ai,.txt"
                   />
-                  <div style={uploadStyles.uploadButtonContainer}>
+                  <div
+                    style={uploadStyles.uploadButtonContainer}
+                    className="__button"
+                  >
                     <div style={uploadStyles.uploadButtonBox}>
                       <div style={uploadStyles.uploadButtonText}>
                         <p style={uploadStyles.uploadButtonTextP}>
