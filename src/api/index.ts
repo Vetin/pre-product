@@ -258,7 +258,7 @@ new Elysia()
           format: t.Union([
             t.Literal('srt'),
             t.Literal('txt'),
-            t.Literal('json'),
+            t.Literal('segmented_json'),
             t.Literal('burn'),
           ]),
         }),
@@ -268,7 +268,7 @@ new Elysia()
             t.Literal('srt'),
             t.Literal('txt'),
             t.Literal('burn'),
-            t.Literal('json'),
+            t.Literal('segmented_json'),
           ]),
         }),
       ]),

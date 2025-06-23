@@ -144,7 +144,7 @@ const api = createApi(BASE_URL);
 const FORMATS = [
   { value: 'srt', label: 'SRT (universal subtitle format)' },
   { value: 'txt', label: 'TXT (plain text with timestamps)' },
-  { value: 'json', label: 'JSON (JSON format)' },
+  { value: 'segmented_json', label: 'JSON (JSON format)' },
   { value: 'burn', label: 'Burnt-in subtitles (hardcoded into video)' },
 ];
 

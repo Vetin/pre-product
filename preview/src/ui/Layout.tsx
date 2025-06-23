@@ -382,6 +382,7 @@ export const Button = ({
   onClick,
   href,
   variant = 'primary',
+  tag,
 }: PropsWithChildren<{
   disabled?: boolean;
   size?: 'small' | 'large';
@@ -389,8 +390,9 @@ export const Button = ({
   onClick?: () => void;
   href?: string;
   variant?: 'primary' | 'outline';
+  tag?: string;
 }>) => {
-  const Tag = href ? 'a' : 'button';
+  const Tag = tag ?? (href ? 'a' : 'button');
   return (
     <Tag
       href={href}
@@ -1370,6 +1372,7 @@ export const Upload = ({
                 </div>
 
                 <Button
+                  tag="div"
                   size="small"
                   onClick={openFileDialog}
                   styles={{
