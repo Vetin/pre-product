@@ -31,7 +31,7 @@ new Elysia()
   )
   .post(
     '/document',
-    async ({ body, request }) => {
+    async ({ body }) => {
       console.log('Start processing request');
       console.dir(body, { depth: Infinity });
 
@@ -346,19 +346,6 @@ new Elysia()
         const base64 = Buffer.from(await dubResponse.arrayBuffer()).toString(
           'base64',
         );
-
-        const metaResponse = await fetch(
-          `https://api.elevenlabs.io/v1/dubbing/${dubbing_id}`,
-          {
-            method: 'GET',
-            headers: {
-              'Xi-Api-Key': import.meta.env.ELEVENLABS_API_KEY!,
-              'Api-Key': 'xi-api-key',
-            },
-          },
-        );
-
-        console.log(await metaResponse.json());
 
         return {
           base64,

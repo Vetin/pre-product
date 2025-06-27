@@ -34,7 +34,7 @@ function FormComponent({
   if (response)
     return (
       <ResponseCard
-        file={new File([], 'test.txt', { type: 'text/plain' })}
+        file={response}
         translateAnother={translateAnother}
         title={responseTitle}
         cta={responseCta}
