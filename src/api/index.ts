@@ -11,7 +11,11 @@ import { rm } from 'fs/promises';
 import { writeFile } from 'fs/promises';
 import { fileTypeFromBuffer } from 'file-type';
 import { addSubtitles } from './burn';
+
+import { handleVideoTranscription, TranscriptionRequest } from './transcription';
 import { downloadValidatedFile } from './download-file';
+import { callElevenLabsAPI } from './elevenLabs';
+
 
 const translator = new DeepLTranslator(Bun.env.DEEPL_API_KEY || '');
 
@@ -162,6 +166,7 @@ new Elysia()
   .post(
     '/subtitle',
     async ({ body }) => {
+      console.log('Start processing subtitle request');
       try {
         let file: File | undefined;
         let cloudStorageUrl: string | undefined;
@@ -204,40 +209,13 @@ new Elysia()
           cloudStorageUrl = body.link;
         }
 
-        const formData = new FormData();
-        formData.append('model_id', 'scribe_v1');
-
-        if (file) {
-          formData.append('file', file);
-        }
-        if (cloudStorageUrl) {
-          formData.append('cloud_storage_url', cloudStorageUrl);
-        }
-        formData.append(
-          'additional_formats',
-          JSON.stringify([{ format: format }]),
-        );
-        formData.append('timestamps_granularity', 'word');
-        formData.append('diarize', 'true');
-
-        const response = await fetch(
-          'https://api.elevenlabs.io/v1/speech-to-text',
-          {
-            method: 'POST',
-            headers: {
-              'Xi-Api-Key': import.meta.env.ELEVENLABS_API_KEY!,
-              'Api-Key': 'xi-api-key',
-            },
-
-            body: formData,
-          },
-        );
+        const response = await callElevenLabsAPI(file, cloudStorageUrl, format);
 
         const {
           additional_formats: [
             { content_type, content, is_base64_encoded, file_extension },
           ],
-        } = await response.json();
+        } = response;
 
         let base64;
 
@@ -386,10 +364,49 @@ new Elysia()
         t.Object({
           file: t.String(),
           lang: t.String(),
+          format: t.Union([t.Literal('burn')]),
         }),
         t.Object({
           link: t.String(),
           lang: t.String(),
+          format: t.Union([t.Literal('burn')]),
+        }),
+      ]),
+    },
+  )
+  .post(
+    '/video_transcription',
+    async ({ body }) => {
+      console.log('Start processing video transcription request');
+      try {
+        const result = await handleVideoTranscription(body as TranscriptionRequest);
+        return result;
+      } catch (error) {
+        return {
+          success: false,
+          error: error instanceof Error ? error.message : 'Unknown error',
+        };
+      }
+    },
+    {
+      body: t.Union([
+        t.Object({
+          file: t.String(),
+          format: t.Union([
+            t.Literal('srt'),
+            t.Literal('txt'),
+            t.Literal('speaker_separated'),
+            t.Literal('ai_summary_transcription'),
+          ]),
+        }),
+        t.Object({
+          link: t.String(),
+          format: t.Union([
+            t.Literal('srt'),
+            t.Literal('txt'),
+            t.Literal('speaker_separated'),
+            t.Literal('ai_summary_transcription'),
+          ]),
         }),
       ]),
     },
@@ -468,3 +485,5 @@ async function handleBurnSubtitles(
     };
   }
 }
+
+// Speaker-separated processing moved to transcription.ts
