@@ -53,7 +53,7 @@ export default function Form({ children, ...rest }: PropsWithChildren<Props>) {
           box-sizing: border-box;
           margin: 0;
           padding: 0;
-          font-family: "Suisse Intl", "Suisse Intl Placeholder", ui-sans-serif;
+          font-family: "Suisse Intl Regular", "Suisse Intl Regular Placeholder", sans-serif;
         }
         .__button[data-variant="primary"]:not(:disabled):hover {
          background-color: #0B0BCF!important;
@@ -272,7 +272,7 @@ const ResponseCard = ({
 
         <div style={{ flex: '1' }} className="image-wrapper">
           <img
-            src="https://framerusercontent.com/images/BxZr79QnA7V7s0eH61Z7PXPl1k.png"
+            src="https://framerusercontent.com/images/iQJ4zFZDOVIiLQ8ICCEbV3YAg.png"
             alt="Editor"
             className="image-editor"
             width={292}
@@ -284,7 +284,7 @@ const ResponseCard = ({
             }}
           />
           <img
-            src="https://framerusercontent.com/images/FryGpy9mQQ2OdHQRi139zjh5v9A.png"
+            src="https://framerusercontent.com/images/Eneq66uhBMqISZViPpOp60jv1ZY.png"
             alt="Video"
             width={185}
             height={130}
@@ -2534,7 +2534,7 @@ const featuresData = [
             style={{ width: '100%' }}
             width="121"
             height="111"
-            src="https://framerusercontent.com/images/qJHpVTV3n1MLBF7TlpNSz1qtYCQ.png"
+            src="https://framerusercontent.com/images/MKjZIy9P1JSNk16bcfZfpQcNew.png"
           />
 
           <div style={featuresStyles.featureBContent}>
@@ -2571,7 +2571,7 @@ const featuresData = [
             style={{ width: '100%' }}
             width="121"
             height="111"
-            src="https://framerusercontent.com/images/LERyzF0zetKy2H3WdAfeP4HfAU0.png"
+            src="https://framerusercontent.com/images/HOlNNP8xOsBujgPXmD4vLoBWKk.png"
           />
           <div style={featuresStyles.featureBContent}>
             <div
@@ -3134,7 +3134,7 @@ const featuresData = [
               }}
             >
               <img
-                src=""
+                src="https://framerusercontent.com/images/lSxxsfw6bH3XuLl9Levs0CuFyE.png"
                 width={24}
                 height={24}
                 style={{ borderRadius: 150 }}

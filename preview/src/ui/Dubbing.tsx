@@ -174,31 +174,31 @@ const api = createApi(BASE_URL);
 const ACCEPT = ['.mp4', '.mov', '.webm', '.mkv', '.mp3', '.wav'];
 
 const LANGUAGES = [
-  { label: 'Hindi', value: 'hi', code: 'hi' },
+  { label: 'Hindi', value: 'hi', code: 'in' },
   { label: 'Portuguese', value: 'pt', code: 'pt' },
-  { label: 'Chinese', value: 'zh', code: 'zh' },
-  { label: 'Japanese', value: 'ja', code: 'ja' },
-  { label: 'Arabic', value: 'ar', code: 'ar' },
+  { label: 'Chinese', value: 'zh', code: 'CN' },
+  { label: 'Japanese', value: 'ja', code: 'jp' },
+  { label: 'Arabic', value: 'ar', code: 'sa' },
   { label: 'Russian', value: 'ru', code: 'ru' },
-  { label: 'Korean', value: 'ko', code: 'ko' },
+  { label: 'Korean', value: 'ko', code: 'kr' },
   { label: 'Indonesian', value: 'id', code: 'id' },
   { label: 'Italian', value: 'it', code: 'it' },
   { label: 'Dutch', value: 'nl', code: 'nl' },
   { label: 'Turkish', value: 'tr', code: 'tr' },
   { label: 'Polish', value: 'pl', code: 'pl' },
   { label: 'Swedish', value: 'sv', code: 'sv' },
-  { label: 'Filipino', value: 'fil', code: 'fil' },
+  { label: 'Filipino', value: 'fil', code: 'ph' },
   { label: 'Malay', value: 'ms', code: 'ms' },
   { label: 'Romanian', value: 'ro', code: 'ro' },
-  { label: 'Ukrainian', value: 'uk', code: 'uk' },
-  { label: 'Greek', value: 'el', code: 'el' },
-  { label: 'Czech', value: 'cs', code: 'cs' },
-  { label: 'Danish', value: 'da', code: 'da' },
+  { label: 'Ukrainian', value: 'uk', code: 'ua' },
+  { label: 'Greek', value: 'el', code: 'gr' },
+  { label: 'Czech', value: 'cs', code: 'cz' },
+  { label: 'Danish', value: 'da', code: 'dk' },
   { label: 'Finnish', value: 'fi', code: 'fi' },
   { label: 'Bulgarian', value: 'bg', code: 'bg' },
   { label: 'Croatian', value: 'hr', code: 'hr' },
   { label: 'Slovak', value: 'sk', code: 'sk' },
-  { label: 'Tamil', value: 'ta', code: 'ta' },
+  { label: 'Tamil', value: 'ta', code: 'in' },
 ];
 
 const OTHERS = LANGUAGES.map(lang => ({
@@ -216,6 +216,7 @@ const OTHERS = LANGUAGES.map(lang => ({
         alt={lang.label}
         width={22}
         height={16}
+        style={{ borderRadius: 2 }}
       />
       <p style={{ margin: 0 }}>{lang.label}</p>
     </div>
