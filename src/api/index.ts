@@ -305,16 +305,8 @@ new Elysia()
             };
 
           const fileBuffer = Buffer.from(match[2], 'base64');
-          const fileExtension = await fileTypeFromBuffer(fileBuffer);
 
-          if (fileExtension?.ext === 'mp3' && body.format === 'burn') {
-            return {
-              success: false,
-              error: 'Burn subtitles is not supported for mp3 files',
-            };
-          }
-
-          file = new File([fileBuffer], 'audio');
+          file = new File([fileBuffer], 'audio', { type: match[1] });
         }
         if ('link' in body) {
           await downloadValidatedFile(body.link, {

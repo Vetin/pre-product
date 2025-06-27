@@ -53,7 +53,7 @@ export default function Form({ children, ...rest }: PropsWithChildren<Props>) {
           box-sizing: border-box;
           margin: 0;
           padding: 0;
-          font-family: "Suisse Intl Regular", "Suisse Intl Regular Placeholder", sans-serif;
+          font-family: "Suisse Intl", "Suisse Intl Placeholder", ui-sans-serif;
         }
         .__button[data-variant="primary"]:not(:disabled):hover {
          background-color: #0B0BCF!important;
@@ -120,7 +120,7 @@ const ResponseCard = ({
             margin: 0,
             color: '#00F',
             textAlign: 'center',
-
+            cursor: 'pointer',
             fontSize: 16,
             fontStyle: 'normal',
             fontWeight: 400,
@@ -1488,7 +1488,7 @@ export const GermanFlag = () => {
       <div>
         <div>
           <svg
-            style={{ display: 'block', width: 22, height: 16 }}
+            style={{ display: 'block', width: 22, height: 16, borderRadius: 2 }}
             fill="none"
             preserveAspectRatio="none"
             viewBox="0 0 22 16"
@@ -1528,7 +1528,7 @@ export const FrenchFlag = () => {
       <div className="flag-box">
         <div className="flag-size">
           <svg
-            style={{ display: 'block', width: 22, height: 16 }}
+            style={{ display: 'block', width: 22, height: 16, borderRadius: 2 }}
             fill="none"
             preserveAspectRatio="none"
             viewBox="0 0 22 16"
@@ -1567,7 +1567,7 @@ export const EnglishFlag = () => {
     <div className="english-flag-container">
       <div className="english-flag-inner">
         <svg
-          style={{ display: 'block', width: 22, height: 16 }}
+          style={{ display: 'block', width: 22, height: 16, borderRadius: 2 }}
           fill="none"
           preserveAspectRatio="none"
           viewBox="0 0 22 16"
@@ -1619,7 +1619,7 @@ export const SpanishFlag = () => {
     <div className="english-flag-container">
       <div className="english-flag-inner">
         <svg
-          style={{ display: 'block', width: 22, height: 16 }}
+          style={{ display: 'block', width: 22, height: 16, borderRadius: 2 }}
           fill="none"
           preserveAspectRatio="none"
           viewBox="0 0 22 16"
@@ -1878,6 +1878,7 @@ export const OTHERS = LANGS.map(lang => ({
         alt={lang.label}
         width={22}
         height={16}
+        style={{ borderRadius: 2 }}
       />
       <p style={{ margin: 0 }}>{lang.label}</p>
     </div>
@@ -2125,18 +2126,17 @@ export const Select = ({
             </span>
             {value === option.value && (
               <svg
-                width="20"
-                height="20"
-                viewBox="0 0 20 20"
-                fill="none"
                 xmlns="http://www.w3.org/2000/svg"
+                width="10"
+                height="6"
+                viewBox="0 0 10 6"
+                fill="none"
               >
                 <path
-                  d="M16.6654 5L7.4987 14.1667L3.33203 10"
-                  stroke="#0B0BCF"
-                  strokeWidth="1.66667"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
+                  fill-rule="evenodd"
+                  clip-rule="evenodd"
+                  d="M4.62861 5.47136C4.88896 5.73171 5.31107 5.73171 5.57142 5.47136L9.57142 1.47136C9.83177 1.21101 9.83177 0.788902 9.57142 0.528552C9.31107 0.268202 8.88896 0.268202 8.62861 0.528552L5.10002 4.05715L1.57142 0.528552C1.31107 0.268202 0.888962 0.268202 0.628612 0.528552C0.368262 0.788902 0.368262 1.21101 0.628612 1.47136L4.62861 5.47136Z"
+                  fill="black"
                 />
               </svg>
             )}
@@ -2185,21 +2185,21 @@ export const Select = ({
           {selectedOption?.value ? selectedOption.label : placeholder}
         </span>
         <svg
-          width="10"
-          height="6"
-          fill="none"
           xmlns="http://www.w3.org/2000/svg"
+          width="17"
+          height="16"
+          viewBox="0 0 17 16"
+          fill="none"
           style={{
             transform: isOpen ? 'rotate(180deg)' : 'rotate(0)',
             transition: 'transform 0.2s',
           }}
         >
           <path
-            d="M1 1L5 5L9 1"
-            stroke={selectedOption?.value ? '#8e44ad' : '#000000'}
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
+            fill-rule="evenodd"
+            clip-rule="evenodd"
+            d="M7.62861 10.4714C7.88896 10.7317 8.31107 10.7317 8.57142 10.4714L12.5714 6.47136C12.8318 6.21101 12.8318 5.7889 12.5714 5.52855C12.3111 5.2682 11.889 5.2682 11.6286 5.52855L8.10002 9.05715L4.57142 5.52855C4.31107 5.2682 3.88896 5.2682 3.62861 5.52855C3.36826 5.7889 3.36826 6.21101 3.62861 6.47136L7.62861 10.4714Z"
+            fill="black"
           />
         </svg>
       </button>
