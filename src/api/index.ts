@@ -11,6 +11,7 @@ import { rm } from 'fs/promises';
 import { writeFile } from 'fs/promises';
 import { fileTypeFromBuffer } from 'file-type';
 import { addSubtitles } from './burn';
+import { handleVideoTranscription, TranscriptionRequest } from './transcription';
 
 const translator = new DeepLTranslator(Bun.env.DEEPL_API_KEY || '');
 
@@ -24,9 +25,10 @@ const ORIGINS = [
 new Elysia()
   .use(
     cors({
-      origin: ORIGINS,
+      origin: true,
       methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
       credentials: true,
+      allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
     }),
   )
   .post(
@@ -161,6 +163,7 @@ new Elysia()
   .post(
     '/subtitle',
     async ({ body }) => {
+      console.log('Start processing subtitle request');
       try {
         let file: File | undefined;
         let cloudStorageUrl: string | undefined;
@@ -377,10 +380,49 @@ new Elysia()
         t.Object({
           file: t.String(),
           lang: t.String(),
+          format: t.Union([t.Literal('burn')]),
         }),
         t.Object({
           link: t.String(),
           lang: t.String(),
+          format: t.Union([t.Literal('burn')]),
+        }),
+      ]),
+    },
+  )
+  .post(
+    '/video_transcription',
+    async ({ body }) => {
+      console.log('Start processing video transcription request');
+      try {
+        const result = await handleVideoTranscription(body as TranscriptionRequest);
+        return result;
+      } catch (error) {
+        return {
+          success: false,
+          error: error instanceof Error ? error.message : 'Unknown error',
+        };
+      }
+    },
+    {
+      body: t.Union([
+        t.Object({
+          file: t.String(),
+          format: t.Union([
+            t.Literal('srt'),
+            t.Literal('txt'),
+            t.Literal('speaker_separated'),
+            t.Literal('ai_summary_transcription'),
+          ]),
+        }),
+        t.Object({
+          link: t.String(),
+          format: t.Union([
+            t.Literal('srt'),
+            t.Literal('txt'),
+            t.Literal('speaker_separated'),
+            t.Literal('ai_summary_transcription'),
+          ]),
         }),
       ]),
     },
@@ -459,3 +501,5 @@ async function handleBurnSubtitles(
     };
   }
 }
+
+// Speaker-separated processing moved to transcription.ts
