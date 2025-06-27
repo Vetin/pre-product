@@ -358,11 +358,11 @@ new Elysia()
           },
         );
 
-        console.log(metaResponse.headers.get('content-type'));
+        console.log(await metaResponse.json());
 
         return {
           base64,
-          contentType: metaResponse.headers.get('content-type'),
+          contentType: dubResponse.headers.get('content-type'),
           success: true,
         };
       } catch (error) {
