@@ -7,18 +7,16 @@ import Form, {
   uploadStyles,
   EnglishFlag,
   FrenchFlag,
-  OTHERS,
   Select,
   SpanishFlag,
   GermanFlag,
   createApi,
 } from './Layout.tsx';
 
-export default function Document() {
+export default function Dubbing() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [link, setLink] = useState<string>('');
-  const [selectedLanguage, setSelectedLanguage] = useState<string>('EN-GB');
-  const [tone, setTone] = useState<string | null>(null);
+  const [selectedLanguage, setSelectedLanguage] = useState<string>('en');
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [response, setResponse] = useState<File | null>(null);
 
@@ -32,7 +30,6 @@ export default function Document() {
 
     const basePayload = {
       lang: selectedLanguage,
-      formality: tone ?? 'default',
     };
     const payload = selectedFile
       ? {
@@ -45,7 +42,7 @@ export default function Document() {
         }
       : { ...basePayload, link };
 
-    const response = await api('/document', payload);
+    const response = await api('/dubbing', payload);
 
     setIsLoading(false);
 
@@ -56,10 +53,14 @@ export default function Document() {
       return;
     }
 
-    const bytes = Uint8Array.from(atob(response.data), c => c.charCodeAt(0));
-    const file = new File([bytes], selectedFile?.name ?? 'output.txt', {
-      type: selectedFile?.type ?? 'text/plain',
-    });
+    const bytes = Uint8Array.from(atob(response.base64), c => c.charCodeAt(0));
+    const file = new File(
+      [bytes],
+      `dubbed${response.fileExtension ? '.' + response.fileExtension : ''}`,
+      {
+        type: response.contentType,
+      },
+    );
 
     setResponse(file);
   };
@@ -67,7 +68,6 @@ export default function Document() {
   const translateAnother = () => {
     setSelectedFile(null);
     setLink('');
-    setTone(null);
     setResponse(null);
   };
 
@@ -79,9 +79,9 @@ export default function Document() {
       isLoading={isLoading}
       response={response}
       translateAnother={translateAnother}
-      loadingTitle="Translating your document"
-      responseTitle="Your document is ready!"
-      responseCta="Translate another document"
+      loadingTitle="Dubbing your video"
+      responseTitle="Your video is ready!"
+      responseCta="Dub another video"
     >
       <Card>
         <Upload
@@ -94,6 +94,7 @@ export default function Document() {
           setFileError={setFileError}
           linkError={linkError}
           setLinkError={setLinkError}
+          fileSizeLimit={30}
         />
 
         <div style={uploadStyles.sectionContainer}>
@@ -107,29 +108,29 @@ export default function Document() {
                 <LanguageOption
                   language="English"
                   flag={<EnglishFlag />}
-                  isSelected={selectedLanguage === 'EN-GB'}
-                  onClick={() => setSelectedLanguage('EN-GB')}
+                  isSelected={selectedLanguage === 'en'}
+                  onClick={() => setSelectedLanguage('en')}
                 />
 
                 <LanguageOption
                   language="German"
                   flag={<GermanFlag />}
-                  isSelected={selectedLanguage === 'DE'}
-                  onClick={() => setSelectedLanguage('DE')}
+                  isSelected={selectedLanguage === 'de'}
+                  onClick={() => setSelectedLanguage('de')}
                 />
 
                 <LanguageOption
                   language="French"
                   flag={<FrenchFlag />}
-                  isSelected={selectedLanguage === 'FR'}
-                  onClick={() => setSelectedLanguage('FR')}
+                  isSelected={selectedLanguage === 'fr'}
+                  onClick={() => setSelectedLanguage('fr')}
                 />
 
                 <LanguageOption
                   language="Spanish"
                   flag={<SpanishFlag />}
-                  isSelected={selectedLanguage === 'ES'}
-                  onClick={() => setSelectedLanguage('ES')}
+                  isSelected={selectedLanguage === 'es'}
+                  onClick={() => setSelectedLanguage('es')}
                 />
 
                 <style>{`
@@ -150,26 +151,15 @@ export default function Document() {
                 />
               </div>
             </div>
-
-            <Select
-              onChange={setTone}
-              options={[
-                { label: 'Not specified', value: null },
-                { label: 'Informal', value: 'prefer_less' },
-                { label: 'Formal', value: 'prefer_more' },
-              ]}
-              placeholder="Select tone"
-              value={tone}
-            />
           </div>
         </div>
 
         <Button
-          disabled={isLoading || (!selectedFile && !link)}
+          disabled={!selectedFile && !link}
           size="large"
           onClick={handleSubmit}
         >
-          {isLoading ? 'Translating...' : 'Translate'}
+          Dub video
         </Button>
       </Card>
     </Form>
@@ -181,4 +171,54 @@ const BASE_URL = 'https://pre-product.onrender.com';
 
 const api = createApi(BASE_URL);
 
-const ACCEPT = ['.pdf', '.doc', '.docx', '.ppt', '.pptx', '.ai', '.txt'];
+const ACCEPT = ['.mp4', '.mov', '.webm', '.mkv', '.mp3', '.wav'];
+
+const LANGUAGES = [
+  { label: 'Hindi', value: 'hi', code: 'hi' },
+  { label: 'Portuguese', value: 'pt', code: 'pt' },
+  { label: 'Chinese', value: 'zh', code: 'zh' },
+  { label: 'Japanese', value: 'ja', code: 'ja' },
+  { label: 'Arabic', value: 'ar', code: 'ar' },
+  { label: 'Russian', value: 'ru', code: 'ru' },
+  { label: 'Korean', value: 'ko', code: 'ko' },
+  { label: 'Indonesian', value: 'id', code: 'id' },
+  { label: 'Italian', value: 'it', code: 'it' },
+  { label: 'Dutch', value: 'nl', code: 'nl' },
+  { label: 'Turkish', value: 'tr', code: 'tr' },
+  { label: 'Polish', value: 'pl', code: 'pl' },
+  { label: 'Swedish', value: 'sv', code: 'sv' },
+  { label: 'Filipino', value: 'fil', code: 'fil' },
+  { label: 'Malay', value: 'ms', code: 'ms' },
+  { label: 'Romanian', value: 'ro', code: 'ro' },
+  { label: 'Ukrainian', value: 'uk', code: 'uk' },
+  { label: 'Greek', value: 'el', code: 'el' },
+  { label: 'Czech', value: 'cs', code: 'cs' },
+  { label: 'Danish', value: 'da', code: 'da' },
+  { label: 'Finnish', value: 'fi', code: 'fi' },
+  { label: 'Bulgarian', value: 'bg', code: 'bg' },
+  { label: 'Croatian', value: 'hr', code: 'hr' },
+  { label: 'Slovak', value: 'sk', code: 'sk' },
+  { label: 'Tamil', value: 'ta', code: 'ta' },
+];
+
+const OTHERS = LANGUAGES.map(lang => ({
+  label: (
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 8,
+      }}
+    >
+      <img
+        src={`https://flagcdn.com/${lang.code?.toLowerCase()}.svg`}
+        alt={lang.label}
+        width={22}
+        height={16}
+      />
+      <p style={{ margin: 0 }}>{lang.label}</p>
+    </div>
+  ),
+  value: lang.value ?? lang.code,
+}));

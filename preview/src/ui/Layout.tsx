@@ -15,6 +15,9 @@ type Props = {
   isLoading: boolean;
   response: File | null;
   translateAnother: () => void;
+  loadingTitle: string;
+  responseTitle: string;
+  responseCta: string;
 };
 
 function FormComponent({
@@ -22,11 +25,21 @@ function FormComponent({
   isLoading,
   response,
   translateAnother,
+  loadingTitle,
+  responseTitle,
+  responseCta,
 }: PropsWithChildren<Props>) {
-  if (isLoading) return <LoadingCard />;
+  if (isLoading) return <LoadingCard title={loadingTitle} />;
 
   if (response)
-    return <ResponseCard file={response} translateAnother={translateAnother} />;
+    return (
+      <ResponseCard
+        file={new File([], 'test.txt', { type: 'text/plain' })}
+        translateAnother={translateAnother}
+        title={responseTitle}
+        cta={responseCta}
+      />
+    );
 
   return <>{children}</>;
 }
@@ -60,9 +73,13 @@ export default function Form({ children, ...rest }: PropsWithChildren<Props>) {
 const ResponseCard = ({
   file,
   translateAnother,
+  title,
+  cta,
 }: {
   file: File;
   translateAnother: () => void;
+  title: string;
+  cta: string;
 }) => {
   return (
     <Card
@@ -95,7 +112,7 @@ const ResponseCard = ({
             margin: 0,
           }}
         >
-          Your translation is ready!
+          {title}
         </p>
         <a
           onClick={translateAnother}
@@ -111,7 +128,7 @@ const ResponseCard = ({
             letterSpacing: '-0.16px',
           }}
         >
-          Translate another document
+          {cta}
         </a>
       </div>
       <Download value={file} />
@@ -145,10 +162,13 @@ const ResponseCard = ({
               gap: 0!important;
               padding-bottom: 0;
               overflow: hidden;
+              padding: 40px 20px;
             }
 
             .__response-card .item {
               width: 100%;
+              align-items: center;
+              text-align: center;
             }
 
             .__response-card .image-wrapper {
@@ -157,18 +177,19 @@ const ResponseCard = ({
             }
 
             .__response-card .image-editor {
-              width: 268px;
-              height: 152px;
-              bottom: -80px!important;
-              left: -32px!important;
-              right: 0!important;
-              transform: rotate(-7.046deg);
+
+              width: 100%;
+              height: 159px;
+              bottom: -78px !important;
+              left: 0px !important;
+              right: 0 !important;
+              max-width: 279px;
             }
 
             .__response-card .image-video {
-              width: 144px;
+              width: 136px;
               height: 96px;
-              transform: rotate(0deg);
+              transform: rotate(0deg)!important;
             }
           }
         `}
@@ -195,7 +216,16 @@ const ResponseCard = ({
             }}
           >
             Translate your videos{'\n'}and audio into any{'\n'}
-            language <span style={{ fontStyle: 'italic' }}>with Rask AI</span>
+            language{' '}
+            <span
+              style={{
+                fontStyle: 'italic',
+                fontFamily:
+                  '"Suisse Works Italic", "Suisse Works Italic Placeholder", sans-serif',
+              }}
+            >
+              with Rask AI
+            </span>
           </p>
           <p
             style={{
@@ -392,7 +422,8 @@ export const Button = ({
   variant?: 'primary' | 'outline';
   tag?: string;
 }>) => {
-  const Tag = tag ?? (href ? 'a' : 'button');
+  const Tag = (tag ?? (href ? 'a' : 'button')) as React.ElementType;
+
   return (
     <Tag
       href={href}
@@ -420,7 +451,8 @@ const buttonStyles = {
       textDecoration: 'none',
       position: 'relative',
       borderRadius: '16px',
-      boxShadow: '0px 1px 2px 0px rgba(20,21,26,0.05)',
+      boxShadow:
+        variant === 'primary' ? '0px 1px 2px 0px rgba(20,21,26,0.05)' : 'none',
       flexShrink: 0,
       width: '100%',
       backgroundColor: isDisabled
@@ -482,10 +514,12 @@ const loadingCardStyles = {
   ctaTitleMarked: {
     color: '#00F',
     fontStyle: 'italic',
+    fontFamily:
+      '"Suisse Works Italic", "Suisse Works Italic Placeholder", sans-serif',
   },
 } as const;
 
-const LoadingCard = () => {
+const LoadingCard = ({ title }: { title: string }) => {
   return (
     <Card
       styles={{
@@ -497,7 +531,7 @@ const LoadingCard = () => {
     >
       <div style={loadingCardStyles.title}>
         <Loader />
-        <p style={loadingCardStyles.titleText}>Translating your document</p>
+        <p style={loadingCardStyles.titleText}>{title}</p>
       </div>
 
       <div style={loadingCardStyles.cta}>
@@ -665,7 +699,7 @@ export const uploadStyles = {
   } as CSSProperties,
   sectionTitleText: {
     display: 'block',
-    lineHeight: 1.3,
+    lineHeight: '130%',
     fontSize: '24px',
     letterSpacing: '-0.72px',
     color: '#000',
@@ -1165,6 +1199,7 @@ export const Upload = ({
   linkError,
   setLinkError,
   accept,
+  fileSizeLimit = 10,
 }: {
   onChange: (file: File | null) => void;
   value: File | null;
@@ -1176,6 +1211,7 @@ export const Upload = ({
   linkError: boolean | string;
   setLinkError: (error: boolean | string) => void;
   accept?: string[];
+  fileSizeLimit?: number;
 }) => {
   const [dragActive, setDragActive] = useState<boolean>(false);
 
@@ -1194,8 +1230,8 @@ export const Upload = ({
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
 
-      if (file.size > 10 * 1024 * 1024)
-        return setFileError(`File size exceeds limit of ${10}MB`);
+      if (file.size > fileSizeLimit * 1024 * 1024)
+        return setFileError(`File size exceeds limit of ${fileSizeLimit}MB`);
 
       onChange(file);
     }
@@ -2179,28 +2215,6 @@ export const Select = ({
       {renderDropdown()}
     </div>
   );
-};
-
-const BASE_URL = 'https://pre-product.onrender.com';
-// const BASE_URL = "http://localhost:3000"
-
-const api = async (url: string, body: unknown) => {
-  const response = await fetch(`${BASE_URL}${url}`, {
-    method: 'POST',
-    body: JSON.stringify(body),
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  });
-
-  if (response.status !== 200) {
-    return {
-      status: 'error',
-      message: 'Failed to translate',
-    };
-  }
-
-  return response.json();
 };
 
 export const createApi = (BASE_URL: string) => {

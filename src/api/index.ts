@@ -20,6 +20,7 @@ const ORIGINS = [
   'https://www.rask.ai',
   'https://excellent-lifecycle-679985.framer.app',
 ];
+
 new Elysia()
   .use(
     cors({
@@ -211,8 +212,7 @@ new Elysia()
           {
             method: 'POST',
             headers: {
-              'Xi-Api-Key':
-                'sk_86274ee2d7fb0bd6b90ca325f8d817ff7b48f1d1c8e91971',
+              'Xi-Api-Key': import.meta.env.ELEVENLABS_API_KEY!,
               'Api-Key': 'xi-api-key',
             },
 
@@ -270,6 +270,117 @@ new Elysia()
             t.Literal('burn'),
             t.Literal('segmented_json'),
           ]),
+        }),
+      ]),
+    },
+  )
+  .post(
+    '/dubbing',
+    async ({ body }) => {
+      try {
+        let file: File | undefined;
+        let cloudStorageUrl: string | undefined;
+
+        if ('file' in body) {
+          const match = body.file.match(/^data:([^;]+);base64,(.+)$/);
+
+          if (!match)
+            return {
+              status: 'error',
+              message: 'Invalid file',
+            };
+
+          const fileBuffer = Buffer.from(match[2], 'base64');
+          const fileExtension = await fileTypeFromBuffer(fileBuffer);
+
+          if (fileExtension?.ext === 'mp3' && body.format === 'burn') {
+            return {
+              success: false,
+              error: 'Burn subtitles is not supported for mp3 files',
+            };
+          }
+
+          file = new File([fileBuffer], 'audio');
+        }
+        if ('link' in body) {
+          cloudStorageUrl = body.link;
+        }
+
+        const formData = new FormData();
+        formData.append('model_id', 'scribe_v1');
+
+        if (file) {
+          formData.append('file', file);
+        }
+        if (cloudStorageUrl) {
+          formData.append('source_url', cloudStorageUrl);
+        }
+        formData.append('target_lang', body.lang);
+
+        const response = await fetch('https://api.elevenlabs.io/v1/dubbing', {
+          method: 'POST',
+          headers: {
+            'Xi-Api-Key': import.meta.env.ELEVENLABS_API_KEY!,
+            'Api-Key': 'xi-api-key',
+          },
+          body: formData,
+        });
+
+        const { dubbing_id, expected_duration_sec } = await response.json();
+
+        await new Promise(resolve =>
+          setTimeout(resolve, expected_duration_sec * 1100),
+        );
+
+        const dubResponse = await fetch(
+          `https://api.elevenlabs.io/v1/dubbing/${dubbing_id}/audio/${body.lang}`,
+          {
+            method: 'GET',
+            headers: {
+              'Xi-Api-Key': import.meta.env.ELEVENLABS_API_KEY!,
+              'Api-Key': 'xi-api-key',
+            },
+          },
+        );
+
+        const base64 = Buffer.from(await dubResponse.arrayBuffer()).toString(
+          'base64',
+        );
+
+        const metaResponse = await fetch(
+          `https://api.elevenlabs.io/v1/dubbing/${dubbing_id}`,
+          {
+            method: 'GET',
+            headers: {
+              'Xi-Api-Key': import.meta.env.ELEVENLABS_API_KEY!,
+              'Api-Key': 'xi-api-key',
+            },
+          },
+        );
+
+        const { media_metadata } = await metaResponse.json();
+
+        return {
+          base64,
+          contentType: media_metadata.content_type,
+          success: true,
+        };
+      } catch (error) {
+        return {
+          success: false,
+          error: error.message,
+        };
+      }
+    },
+    {
+      body: t.Union([
+        t.Object({
+          file: t.String(),
+          lang: t.String(),
+        }),
+        t.Object({
+          link: t.String(),
+          lang: t.String(),
         }),
       ]),
     },

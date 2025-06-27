@@ -71,6 +71,9 @@ export default function Subtitle() {
       isLoading={isLoading}
       response={response}
       translateAnother={translateAnother}
+      loadingTitle="Generating subtitles"
+      responseTitle="Your subtitles is ready!"
+      responseCta="Generate for another video"
     >
       <Card>
         <Upload

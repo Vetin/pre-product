@@ -14,7 +14,7 @@ import Form, {
   createApi,
 } from './Layout.tsx';
 
-export default function Document() {
+export default function SubtitleTranslation() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [link, setLink] = useState<string>('');
   const [selectedLanguage, setSelectedLanguage] = useState<string>('EN-GB');
@@ -79,9 +79,9 @@ export default function Document() {
       isLoading={isLoading}
       response={response}
       translateAnother={translateAnother}
-      loadingTitle="Translating your document"
-      responseTitle="Your document is ready!"
-      responseCta="Translate another document"
+      loadingTitle="Translating your subtitles"
+      responseTitle="Your subtitles is ready!"
+      responseCta="Translate another subtitles"
     >
       <Card>
         <Upload
@@ -181,4 +181,4 @@ const BASE_URL = 'https://pre-product.onrender.com';
 
 const api = createApi(BASE_URL);
 
-const ACCEPT = ['.pdf', '.doc', '.docx', '.ppt', '.pptx', '.ai', '.txt'];
+const ACCEPT = ['.srt', '.txt'];
