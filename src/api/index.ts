@@ -28,10 +28,9 @@ const ORIGINS = [
 new Elysia()
   .use(
     cors({
-      origin: true,
+      origin: ORIGINS,
       methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
       credentials: true,
-      allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
     }),
   )
   .post(
