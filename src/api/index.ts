@@ -11,6 +11,7 @@ import { rm } from 'fs/promises';
 import { writeFile } from 'fs/promises';
 import { fileTypeFromBuffer } from 'file-type';
 import { addSubtitles } from './burn';
+import { downloadValidatedFile } from './download-file';
 
 const translator = new DeepLTranslator(Bun.env.DEEPL_API_KEY || '');
 
@@ -188,6 +189,18 @@ new Elysia()
           file = new File([fileBuffer], 'audio');
         }
         if ('link' in body) {
+          await downloadValidatedFile(body.link, {
+            maxLength: 30 * 1024 * 1024,
+            contentTypes: [
+              'video/mp4',
+              'video/quicktime',
+              'video/webm',
+              'video/x-matroska',
+              'audio/mpeg',
+              'audio/wav',
+            ],
+          });
+
           cloudStorageUrl = body.link;
         }
 
@@ -245,6 +258,7 @@ new Elysia()
           fileExtension: file_extension,
         };
       } catch (error) {
+        console.log(error);
         return {
           success: false,
           error: error.message,
@@ -303,6 +317,18 @@ new Elysia()
           file = new File([fileBuffer], 'audio');
         }
         if ('link' in body) {
+          await downloadValidatedFile(body.link, {
+            maxLength: 30 * 1024 * 1024,
+            contentTypes: [
+              'video/mp4',
+              'video/quicktime',
+              'video/webm',
+              'video/x-matroska',
+              'audio/mpeg',
+              'audio/wav',
+            ],
+          });
+
           cloudStorageUrl = body.link;
         }
 
@@ -326,7 +352,11 @@ new Elysia()
           body: formData,
         });
 
-        const { dubbing_id, expected_duration_sec } = await response.json();
+        const responseJSON = await response.json();
+
+        console.log(responseJSON);
+
+        const { dubbing_id, expected_duration_sec } = responseJSON;
 
         await new Promise(resolve =>
           setTimeout(resolve, expected_duration_sec * 1100),
@@ -375,7 +405,7 @@ new Elysia()
   .onError(({ error }) => {
     console.log(error);
   })
-  .listen(3000, () => {
+  .listen(3010, () => {
     console.log('Server is running on http://localhost:3000');
   });
 

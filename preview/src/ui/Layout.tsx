@@ -1275,14 +1275,6 @@ export const Upload = ({
   const onLinkChange = (e: ChangeEvent<HTMLInputElement>) => {
     setLinkError(false);
     setLink(e.target.value);
-
-    const ext = e.target.value.split('.').pop();
-
-    if (!ext) return;
-
-    if (!accept?.includes(`.${ext}`)) {
-      setLinkError(true);
-    }
   };
 
   if (value) {

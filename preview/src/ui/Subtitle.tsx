@@ -41,10 +41,10 @@ export default function Subtitle() {
 
     setIsLoading(false);
 
-    if (response.status === 'error') {
+    if (response.success === false) {
       setIsLoading(false);
       const method = 'link' in payload ? setLinkError : setFileError;
-      method(response.message ?? 'Unknown error');
+      method(response.error ?? 'Unknown error');
       return;
     }
 
@@ -86,6 +86,7 @@ export default function Subtitle() {
           linkError={linkError}
           setLinkError={setLinkError}
           accept={ACCEPT}
+          fileSizeLimit={30}
         />
 
         <div style={uploadStyles.sectionContainer}>
@@ -139,8 +140,8 @@ export default function Subtitle() {
 }
 
 //const BASE_URL = 'https://verbose-lamp-vq7v777gqvv39x4-3000.app.github.dev';
-const BASE_URL = 'https://pre-product.onrender.com';
-//const BASE_URL = 'http://localhost:3000';
+// const BASE_URL = 'https://pre-product.onrender.com';
+const BASE_URL = 'http://localhost:3010';
 
 const api = createApi(BASE_URL);
 

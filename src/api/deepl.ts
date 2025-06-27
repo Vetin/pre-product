@@ -2,6 +2,7 @@ import axios, { AxiosResponse } from 'axios';
 import FormData from 'form-data';
 import fs from 'fs';
 import path from 'path';
+import { downloadValidatedFile } from './download-file';
 
 // Types and interfaces
 interface SupportedFormats {
@@ -76,23 +77,9 @@ export class DeepLTranslator {
   }
 
   private validateFile(filePath: string): void {
-    const ext = path.extname(filePath).toLowerCase().replace('.', '');
-
     const stats = fs.statSync(filePath);
     if (stats.size > 10 * 1024 * 1024) {
       throw new FileValidationError(`File size exceeds limit of ${10}MB`);
-    }
-  }
-
-  private validateFileUrl(url: string): void {
-    const ext = path.extname(url).toLowerCase().replace('.', '');
-
-    if (!DEEPL_SUPPORTED_FORMATS[ext]) {
-      throw new FileValidationError(
-        `Unsupported file format in URL: ${ext}. Supported formats are: ${Object.keys(
-          DEEPL_SUPPORTED_FORMATS,
-        ).join(', ')}`,
-      );
     }
   }
 
@@ -218,18 +205,14 @@ export class DeepLTranslator {
     formality: Formality = 'default',
   ) {
     try {
-      this.validateFileUrl(url);
-
-      const response = await axios.get(url, {
-        responseType: 'arraybuffer',
-        maxContentLength: Math.max(...Object.values(FILE_SIZE_LIMITS)),
+      const response = await downloadValidatedFile(url, {
+        maxLength: Math.max(...Object.values(FILE_SIZE_LIMITS)),
       });
 
       const tempPath = `temp_file${path.extname(url)}`;
       fs.writeFileSync(tempPath, response.data);
 
       try {
-        this.validateFile(tempPath);
         return await this.translateDocument(tempPath, targetLang, formality);
       } finally {
         if (fs.existsSync(tempPath)) {
