@@ -12,10 +12,12 @@ import { writeFile } from 'fs/promises';
 import { fileTypeFromBuffer } from 'file-type';
 import { addSubtitles } from './burn';
 
-import { handleVideoTranscription, TranscriptionRequest } from './transcription';
+import {
+  handleVideoTranscription,
+  TranscriptionRequest,
+} from './transcription';
 import { downloadValidatedFile } from './download-file';
 import { callElevenLabsAPI } from './elevenLabs';
-
 
 const translator = new DeepLTranslator(Bun.env.DEEPL_API_KEY || '');
 
@@ -362,12 +364,10 @@ new Elysia()
         t.Object({
           file: t.String(),
           lang: t.String(),
-          format: t.Union([t.Literal('burn')]),
         }),
         t.Object({
           link: t.String(),
           lang: t.String(),
-          format: t.Union([t.Literal('burn')]),
         }),
       ]),
     },
@@ -377,7 +377,9 @@ new Elysia()
     async ({ body }) => {
       console.log('Start processing video transcription request');
       try {
-        const result = await handleVideoTranscription(body as TranscriptionRequest);
+        const result = await handleVideoTranscription(
+          body as TranscriptionRequest,
+        );
         return result;
       } catch (error) {
         return {
@@ -485,3 +487,133 @@ async function handleBurnSubtitles(
 }
 
 // Speaker-separated processing moved to transcription.ts
+
+// .post(
+//   '/subtitle',
+//   async ({ body }) => {
+//     try {
+//       let file: File | undefined;
+//       let cloudStorageUrl: string | undefined;
+//       const format = body.format === 'burn' ? 'srt' : body.format;
+
+//       if ('file' in body) {
+//         const match = body.file.match(/^data:([^;]+);base64,(.+)$/);
+
+//         if (!match)
+//           return {
+//             status: 'error',
+//             message: 'Invalid file',
+//           };
+
+//         const fileBuffer = Buffer.from(match[2], 'base64');
+//         const fileExtension = await fileTypeFromBuffer(fileBuffer);
+
+//         if (fileExtension?.ext === 'mp3' && body.format === 'burn') {
+//           return {
+//             success: false,
+//             error: 'Burn subtitles is not supported for mp3 files',
+//           };
+//         }
+
+//         file = new File([fileBuffer], 'audio');
+//       }
+//       if ('link' in body) {
+//         await downloadValidatedFile(body.link, {
+//           maxLength: 30 * 1024 * 1024,
+//           contentTypes: [
+//             'video/mp4',
+//             'video/quicktime',
+//             'video/webm',
+//             'video/x-matroska',
+//             'audio/mpeg',
+//             'audio/wav',
+//           ],
+//         });
+
+//         cloudStorageUrl = body.link;
+//       }
+
+//       const formData = new FormData();
+//       formData.append('model_id', 'scribe_v1');
+
+//       if (file) {
+//         formData.append('file', file);
+//       }
+//       if (cloudStorageUrl) {
+//         formData.append('cloud_storage_url', cloudStorageUrl);
+//       }
+//       formData.append(
+//         'additional_formats',
+//         JSON.stringify([{ format: format }]),
+//       );
+//       formData.append('timestamps_granularity', 'word');
+//       formData.append('diarize', 'true');
+
+//       const response = await fetch(
+//         'https://api.elevenlabs.io/v1/speech-to-text',
+//         {
+//           method: 'POST',
+//           headers: {
+//             'Xi-Api-Key': import.meta.env.ELEVENLABS_API_KEY!,
+//             'Api-Key': 'xi-api-key',
+//           },
+
+//           body: formData,
+//         },
+//       );
+
+//       const {
+//         additional_formats: [
+//           { content_type, content, is_base64_encoded, file_extension },
+//         ],
+//       } = await response.json();
+
+//       let base64;
+
+//       if (is_base64_encoded) {
+//         base64 = content;
+//       } else {
+//         base64 = Buffer.from(content, 'utf8').toString('base64');
+//       }
+
+//       if (body.format === 'burn') {
+//         return await handleBurnSubtitles(body, base64);
+//       }
+
+//       return {
+//         base64,
+//         contentType: content_type,
+//         success: true,
+//         fileExtension: file_extension,
+//       };
+//     } catch (error) {
+//       console.log(error);
+//       return {
+//         success: false,
+//         error: error.message,
+//       };
+//     }
+//   },
+//   {
+//     body: t.Union([
+//       t.Object({
+//         file: t.String(),
+//         format: t.Union([
+//           t.Literal('srt'),
+//           t.Literal('txt'),
+//           t.Literal('segmented_json'),
+//           t.Literal('burn'),
+//         ]),
+//       }),
+//       t.Object({
+//         link: t.String(),
+//         format: t.Union([
+//           t.Literal('srt'),
+//           t.Literal('txt'),
+//           t.Literal('burn'),
+//           t.Literal('segmented_json'),
+//         ]),
+//       }),
+//     ]),
+//   },
+// )
