@@ -1395,7 +1395,7 @@ export const Upload = ({
               <div style={uploadStyles.dragDropBox}>
                 <div style={uploadStyles.uploadText}>
                   <p style={uploadStyles.uploadTextP}>
-                    Upload a file up to 10MB
+                    Upload a file up to {fileSizeLimit}MB
                   </p>
                 </div>
 
@@ -2154,6 +2154,7 @@ export const Select = ({
         position: 'relative',
         width: '100%',
         ...style,
+        minWidth: '106px',
       }}
       className={className}
     >

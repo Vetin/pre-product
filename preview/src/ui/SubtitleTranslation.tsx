@@ -99,7 +99,7 @@ export default function SubtitleTranslation() {
         <div style={uploadStyles.sectionContainer}>
           <div style={uploadStyles.sectionBox}>
             <div style={uploadStyles.sectionTitle}>
-              <p style={uploadStyles.sectionTitleText}>Translate to</p>
+              <p className="__section-title">Translate to</p>
             </div>
 
             <div style={uploadStyles.languageOptionsContainer}>
