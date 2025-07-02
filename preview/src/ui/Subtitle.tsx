@@ -92,7 +92,12 @@ export default function Subtitle() {
         <div style={uploadStyles.sectionContainer}>
           <div style={uploadStyles.sectionBox}>
             <div style={uploadStyles.sectionTitle}>
-              <p style={uploadStyles.sectionTitleText}>Choose output format</p>
+              <p
+                style={uploadStyles.sectionTitleText}
+                className="__section-title"
+              >
+                Choose output format
+              </p>
             </div>
             <div
               style={{

@@ -326,8 +326,6 @@ new Elysia()
 
         const responseJSON = await response.json();
 
-        console.log(responseJSON);
-
         const { dubbing_id, expected_duration_sec } = responseJSON;
 
         await new Promise(resolve =>

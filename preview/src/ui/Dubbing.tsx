@@ -216,7 +216,7 @@ const OTHERS = LANGUAGES.map(lang => ({
         alt={lang.label}
         width={22}
         height={16}
-        style={{ borderRadius: 2 }}
+        style={{ borderRadius: 2, height: '100%' }}
       />
       <p style={{ margin: 0 }}>{lang.label}</p>
     </div>

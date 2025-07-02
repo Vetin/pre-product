@@ -55,6 +55,9 @@ export default function Form({ children, ...rest }: PropsWithChildren<Props>) {
           padding: 0;
           font-family: "Suisse Intl Regular", "Suisse Intl Regular Placeholder", sans-serif;
         }
+        .__button {
+          font-family: "Suisse Intl Light", "Suisse Intl Light Placeholder", sans-serif;
+        }
         .__button[data-variant="primary"]:not(:disabled):hover {
          background-color: #0B0BCF!important;
         }
@@ -183,7 +186,7 @@ const ResponseCard = ({
               bottom: -78px !important;
               left: 0px !important;
               right: 0 !important;
-              max-width: 279px;
+              object-fit: contain;
             }
 
             .__response-card .image-video {
@@ -1775,11 +1778,11 @@ const LANGS = [
     label: 'Italian',
   },
   {
-    code: 'JA',
+    code: 'JP',
     label: 'Japanese',
   },
   {
-    code: 'KO',
+    code: 'KR',
     label: 'Korean',
   },
   {
@@ -1878,7 +1881,7 @@ export const OTHERS = LANGS.map(lang => ({
         alt={lang.label}
         width={22}
         height={16}
-        style={{ borderRadius: 2 }}
+        style={{ borderRadius: 2, height: '100%' }}
       />
       <p style={{ margin: 0 }}>{lang.label}</p>
     </div>
@@ -1950,6 +1953,8 @@ export const LanguageOption = ({
       display: 'block',
       lineHeight: '22px',
       whiteSpace: 'pre',
+      fontFamily:
+        '"Suisse Intl Light", "Suisse Intl Light Placeholder", sans-serif',
     } as React.CSSProperties,
   };
 
@@ -2532,8 +2537,12 @@ const featuresData = [
       <>
         <div style={featuresStyles.featureB}>
           <img
-            style={{ width: '100%' }}
-            width="121"
+            style={{
+              width: '100%',
+              borderTopLeftRadius: 'inherit',
+              borderTopRightRadius: 'inherit',
+            }}
+            width="111"
             height="111"
             src="https://framerusercontent.com/images/MKjZIy9P1JSNk16bcfZfpQcNew.png"
           />
@@ -2541,7 +2550,6 @@ const featuresData = [
           <div style={featuresStyles.featureBContent}>
             <div
               style={{
-                padding: '8px 12px',
                 display: 'flex',
                 gap: 8,
                 flexDirection: 'column',
@@ -2569,15 +2577,18 @@ const featuresData = [
         </div>
         <div style={featuresStyles.featureB}>
           <img
-            style={{ width: '100%' }}
-            width="121"
+            style={{
+              width: '100%',
+              borderTopLeftRadius: 'inherit',
+              borderTopRightRadius: 'inherit',
+            }}
+            width="111"
             height="111"
             src="https://framerusercontent.com/images/HOlNNP8xOsBujgPXmD4vLoBWKk.png"
           />
           <div style={featuresStyles.featureBContent}>
             <div
               style={{
-                padding: '8px 12px',
                 display: 'flex',
                 gap: 8,
                 flexDirection: 'column',
