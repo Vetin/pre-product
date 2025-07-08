@@ -56,7 +56,7 @@ export default function Form({ children, ...rest }: PropsWithChildren<Props>) {
           font-family: "Suisse Intl Regular", "Suisse Intl Regular Placeholder", sans-serif;
         }
         .__button {
-          font-family: "Suisse Intl Light", "Suisse Intl Light Placeholder", sans-serif;
+          font-family: "Suisse Intl Medium", "Suisse Intl Medium Placeholder", sans-serif;
         }
         .__button[data-variant="primary"]:not(:disabled):hover {
          background-color: #0B0BCF!important;
@@ -158,6 +158,9 @@ const ResponseCard = ({
           .__response-card .item {
             width: 50%;
           }
+            .img-mobile {
+              display: none;
+            }
           @media screen and (max-width: 1024px) {
             .__response-card {
               height: 400px;
@@ -194,6 +197,18 @@ const ResponseCard = ({
               height: 96px;
               transform: rotate(0deg)!important;
             }
+
+
+
+
+              .img-mobile {
+                display: block;
+              }
+
+            .img-desktop {
+              display: none;
+            }
+
           }
         `}
         </style>
@@ -259,7 +274,8 @@ const ResponseCard = ({
               marginTop: 16,
               color: '#00F',
               textAlign: 'center',
-
+              fontFamily:
+                '"Suisse Intl Medium", "Suisse Intl Medium Placeholder", sans-serif',
               fontSize: 14,
               fontStyle: 'normal',
               fontWeight: 450,
@@ -273,42 +289,34 @@ const ResponseCard = ({
           </a>
         </div>
 
-        <div style={{ flex: '1' }} className="image-wrapper">
+        <div
+          style={{ flex: '1', display: 'flex', alignItems: 'center' }}
+          className="image-wrapper"
+        >
+          {/* mobile
+                    https://framerusercontent.com/images/BFsYEafaggYlnIZpRvm8iGphA0.png
+                    // desktop https://framerusercontent.com/images/XhMdMOwv37KhomRnOW8rYJH0zk.png
+                    */}
           <img
-            src="https://framerusercontent.com/images/iQJ4zFZDOVIiLQ8ICCEbV3YAg.png"
-            alt="Editor"
-            className="image-editor"
-            width={292}
-            height={166}
+            src="https://framerusercontent.com/images/XhMdMOwv37KhomRnOW8rYJH0zk.png"
+            alt="document"
+            className="img-desktop"
             style={{
               position: 'absolute',
-              right: 32,
-              bottom: 14,
+              height: '100%',
+              top: '50%',
+              transform: 'translateY(-50%)',
+              right: 0,
             }}
           />
           <img
-            src="https://framerusercontent.com/images/Eneq66uhBMqISZViPpOp60jv1ZY.png"
-            alt="Video"
-            width={185}
-            height={130}
-            className="image-video"
+            src="https://framerusercontent.com/images/BFsYEafaggYlnIZpRvm8iGphA0.png"
+            alt="document"
+            className="img-mobile"
             style={{
-              position: 'absolute',
-              right: 4,
-              top: 14,
-              transform: 'rotate(-7.635deg)',
-            }}
-          />
-          <img
-            src="https://framerusercontent.com/images/SS1jmFtYlXXWWpUlXvksS7fmN4.png"
-            alt="Grid"
-            width={289}
-            height={340}
-            style={{
-              position: 'absolute',
-              right: -32,
-              top: -32,
-              transform: 'rotate(-7.338deg)',
+              height: '100%',
+              maxWidth: 310,
+              margin: '0 auto',
             }}
           />
         </div>
@@ -2077,14 +2085,37 @@ export const Select = ({
       typeof window !== 'undefined' ? document.getElementById('portal') : null;
     if (!portalElement || !isOpen) return null;
 
+    // Calculate safe position with boundary checks
+    const calculateSafePosition = () => {
+      const dropdownWidth = 220; // from the style
+      const viewportWidth = window.innerWidth;
+      const minGap = 5;
+
+      // Calculate centered position
+      const centeredLeft = dropdownPosition.centerX - dropdownWidth / 2;
+
+      // Clamp the position to stay within viewport bounds
+      const leftPosition = Math.max(
+        minGap, // Don't go beyond left edge
+        Math.min(
+          centeredLeft, // Preferred centered position
+          viewportWidth - dropdownWidth - minGap, // Don't go beyond right edge
+        ),
+      );
+
+      return leftPosition;
+    };
+
+    const safeLeft = calculateSafePosition();
+
     return createPortal(
       <div
         ref={dropdownRef}
         style={{
           position: 'fixed',
           top: dropdownPosition.top,
-          left: dropdownPosition.centerX,
-          transform: 'translateX(-50%)',
+          left: safeLeft,
+          transform: 'none',
           backgroundColor: 'white',
           border: '1px solid var(--Gray-200---stroke, #EAECF0)',
           borderRadius: '16px',
@@ -2560,6 +2591,7 @@ const featuresData = [
                 style={{
                   display: 'flex',
                   flexDirection: 'column',
+                  gap: 4,
                 }}
               >
                 <p style={featuresStyles.featureBContentText}>
@@ -2599,6 +2631,7 @@ const featuresData = [
                 style={{
                   display: 'flex',
                   flexDirection: 'column',
+                  gap: 4,
                 }}
               >
                 <p style={featuresStyles.featureBContentText}>
