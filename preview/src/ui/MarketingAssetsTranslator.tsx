@@ -150,17 +150,6 @@ export default function MarketingAssetsTranslator() {
                 />
               </div>
             </div>
-
-            <Select
-              onChange={setTone}
-              options={[
-                { label: 'Not specified', value: null },
-                { label: 'Informal', value: 'prefer_less' },
-                { label: 'Formal', value: 'prefer_more' },
-              ]}
-              placeholder="Select tone"
-              value={tone}
-            />
           </div>
         </div>
 

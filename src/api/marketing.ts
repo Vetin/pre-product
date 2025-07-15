@@ -207,7 +207,157 @@ class WidnAIClient {
   }
 
   /**
-   * Translate a document file
+   * Upload a document file to WIDN for translation
+   */
+  async uploadDocumentForTranslation(filePath: string): Promise<string> {
+    const formData = new FormData();
+    const fileBuffer = await readFile(filePath);
+    const fileName = filePath.split('/').pop() || 'document';
+
+    formData.append('file', new Blob([fileBuffer]), fileName);
+
+    try {
+      const response = await fetch(`${this.baseUrl}/translate-file`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${this.apiKey}`,
+        },
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new TranslationError(
+          `Failed to upload document: ${response.status} - ${errorText}`,
+        );
+      }
+
+      const result = await response.json();
+      return result.fileId || result.id;
+    } catch (error) {
+      if (error instanceof TranslationError) throw error;
+      throw new TranslationError(`Failed to upload document: ${error.message}`);
+    }
+  }
+
+  /**
+   * Start translation of an uploaded document
+   */
+  async startDocumentTranslation(
+    fileId: string,
+    targetLanguage: string,
+    sourceLanguage?: string,
+  ): Promise<void> {
+    console.log({
+      targetLocale: targetLanguage,
+      sourceLocale: sourceLanguage,
+      instructions: SYSTEM_PROMPT,
+      tone: 'formal',
+      model: 'sugarloaf',
+    });
+    try {
+      const response = await fetch(
+        `${this.baseUrl}/translate-file/${fileId}/translate`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${this.apiKey}`,
+          },
+          body: JSON.stringify({
+            config: {
+              targetLocale: targetLanguage,
+              sourceLocale: sourceLanguage,
+              instructions: SYSTEM_PROMPT,
+              tone: 'formal',
+              model: 'sugarloaf',
+            },
+          }),
+        },
+      );
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.log(errorText);
+        throw new TranslationError(
+          `Failed to start translation: ${response.status} - ${errorText}`,
+        );
+      }
+    } catch (error) {
+      if (error instanceof TranslationError) throw error;
+      throw new TranslationError(
+        `Failed to start translation: ${error.message}`,
+      );
+    }
+  }
+
+  /**
+   * Check the status of a document translation
+   */
+  async getDocumentTranslationStatus(fileId: string): Promise<{
+    status: string;
+    progress?: number;
+    sourceLanguage?: string;
+    targetLanguage?: string;
+  }> {
+    try {
+      const response = await fetch(`${this.baseUrl}/translate-file/${fileId}`, {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${this.apiKey}`,
+        },
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new TranslationError(
+          `Failed to get translation status: ${response.status} - ${errorText}`,
+        );
+      }
+
+      return await response.json();
+    } catch (error) {
+      if (error instanceof TranslationError) throw error;
+      throw new TranslationError(
+        `Failed to get translation status: ${error.message}`,
+      );
+    }
+  }
+
+  /**
+   * Download the translated document
+   */
+  async downloadTranslatedDocument(fileId: string): Promise<Buffer> {
+    try {
+      const response = await fetch(
+        `${this.baseUrl}/translate-file/${fileId}/download`,
+        {
+          method: 'GET',
+          headers: {
+            Authorization: `Bearer ${this.apiKey}`,
+          },
+        },
+      );
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new TranslationError(
+          `Failed to download translated document: ${response.status} - ${errorText}`,
+        );
+      }
+
+      const arrayBuffer = await response.arrayBuffer();
+      return Buffer.from(arrayBuffer);
+    } catch (error) {
+      if (error instanceof TranslationError) throw error;
+      throw new TranslationError(
+        `Failed to download translated document: ${error.message}`,
+      );
+    }
+  }
+
+  /**
+   * Translate a document file using WIDN document translation API
    */
   async translateDocument(
     filePath: string,
@@ -215,31 +365,44 @@ class WidnAIClient {
   ): Promise<Buffer> {
     const fileExtension = filePath.split('.').pop() || 'txt';
 
-    // Extract text and detect language
-    const { text, sourceLanguage } = await this.extractTextFromFile(
+    // Extract text and detect language for source language detection
+    const { sourceLanguage } = await this.extractTextFromFile(
       filePath,
       fileExtension,
     );
 
-    if (!text.trim()) {
-      throw new FileValidationError(
-        'The file appears to be empty or contains no extractable text',
-      );
+    // Upload the document
+    const fileId = await this.uploadDocumentForTranslation(filePath);
+
+    // Start translation
+    await this.startDocumentTranslation(fileId, targetLanguage, sourceLanguage);
+
+    // Poll for completion
+    let status = 'processing';
+    let attempts = 0;
+    const maxAttempts = 60; // 5 minutes with 5-second intervals
+
+    while (status !== 'translated' && attempts < maxAttempts) {
+      await new Promise(resolve => setTimeout(resolve, 1000)); // Wait 5 seconds
+
+      const statusResponse = await this.getDocumentTranslationStatus(fileId);
+      status = statusResponse.status;
+
+      if (status === 'failed' || status === 'error') {
+        throw new TranslationError(
+          `Document translation failed with status: ${status}`,
+        );
+      }
+
+      attempts++;
     }
 
-    // Translate the text
-    const translatedText = await this.translateText(
-      text,
-      targetLanguage,
-      sourceLanguage,
-      {
-        instructions: SYSTEM_PROMPT,
-      },
-    );
+    if (status !== 'translated') {
+      throw new TranslationError('Document translation timed out');
+    }
 
-    // For now, return the translated text as a buffer
-    // In a real implementation, you might want to preserve the original format
-    return Buffer.from(translatedText, 'utf-8');
+    // Download the translated document
+    return await this.downloadTranslatedDocument(fileId);
   }
 
   /**
