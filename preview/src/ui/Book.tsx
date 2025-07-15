@@ -14,7 +14,7 @@ import Form, {
   createApi,
 } from './Layout.tsx';
 
-export default function Document() {
+export default function Book() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [link, setLink] = useState<string>('');
   const [selectedLanguage, setSelectedLanguage] = useState<string>('EN-GB');
@@ -79,9 +79,9 @@ export default function Document() {
       isLoading={isLoading}
       response={response}
       translateAnother={translateAnother}
-      loadingTitle="Translating your document"
-      responseTitle="Your document is ready!"
-      responseCta="Translate another document"
+      loadingTitle="Translating your book"
+      responseTitle="Your book is ready!"
+      responseCta="Translate another book"
     >
       <Card>
         <Upload
@@ -176,8 +176,8 @@ export default function Document() {
   );
 }
 
-// const BASE_URL = 'https://pre-product.onrender.com';
-const BASE_URL = 'http://localhost:3000';
+const BASE_URL = 'https://pre-product.onrender.com';
+// const BASE_URL = "http://localhost:3000"
 
 const api = createApi(BASE_URL);
 

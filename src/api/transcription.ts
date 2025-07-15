@@ -1,9 +1,9 @@
-import OpenAI from "openai";
-import { callElevenLabsAPI } from "./elevenLabs";
+import OpenAI from 'openai';
+import { callElevenLabsAPI } from './elevenLabs';
 
 const openAIClient = new OpenAI({
-    apiKey: import.meta.env.OPENAI_API_KEY!,
-  });
+  apiKey: import.meta.env.OPENAI_API_KEY! ?? 'DEBUG',
+});
 
 // Types
 export interface TranscriptionRequest {
@@ -20,12 +20,12 @@ export interface TranscriptionResponse {
 }
 
 const systemPrompt = `
-You are a helpful assistant that creates concise summaries of transcripts. 
+You are a helpful assistant that creates concise summaries of transcripts.
 Your task is to analyze the transcript and generate a short, clear, and informative summary of the key points and main topics discussed.
 Do not include any introductory or closing text — only the summary.
 Write the summary in transcription-style language, reflecting the tone and style of the speakers.
-The summary should appear under a heading called "## Summary", followed by a line break. 
-After the summary, include the full original transcript exactly as it was received. 
+The summary should appear under a heading called "## Summary", followed by a line break.
+After the summary, include the full original transcript exactly as it was received.
 Do not include any other text than the summary.
 
 Output format:
@@ -35,8 +35,7 @@ Output format:
 
 ## Full Transcript
 [Full original transcript]
-`
-
+`;
 
 // Process speaker-separated transcript from ElevenLabs response
 export function processSpeakerSeparated(data: any): string {
@@ -51,12 +50,12 @@ export function processSpeakerSeparated(data: any): string {
   for (const word of data.words) {
     if (word.type === 'word' && word.speaker_id) {
       const speaker = word.speaker_id.replace('speaker_', 'Speaker ');
-      
+
       if (speaker !== currentSpeaker) {
         if (currentText.trim()) {
           result += `${currentSpeaker}:\n${currentText.trim()}\n\n`;
         }
-        
+
         currentSpeaker = speaker;
         currentText = word.text;
       } else {
@@ -66,7 +65,7 @@ export function processSpeakerSeparated(data: any): string {
       currentText += word.text;
     }
   }
-  
+
   if (currentText.trim()) {
     result += `${currentSpeaker}:\n${currentText.trim()}\n`;
   }
@@ -84,7 +83,6 @@ async function generateAISummary(transcript: string): Promise<string> {
     });
 
     return response.output_text || 'Summary generation failed.';
-    
   } catch (error) {
     console.error('AI Summary error:', error);
     return 'Summary generation failed. Please check the transcript below.';
@@ -100,11 +98,11 @@ function extractFullTranscript(data: any): string {
   if (data.transcript) {
     return data.transcript;
   }
-  
+
   if (data.text) {
     return data.text;
   }
-  
+
   return 'No transcript available';
 }
 
@@ -121,7 +119,9 @@ function mapFormatToElevenLabs(format: string): string {
 }
 
 // Create file from base64
-async function createFileFromRequest(body: TranscriptionRequest): Promise<File | undefined> {
+async function createFileFromRequest(
+  body: TranscriptionRequest,
+): Promise<File | undefined> {
   if (!('file' in body) || !body.file) return undefined;
 
   const match = body.file.match(/^data:([^;]+);base64,(.+)$/);
@@ -131,11 +131,9 @@ async function createFileFromRequest(body: TranscriptionRequest): Promise<File |
   return new File([fileBuffer], 'audio');
 }
 
-
-
 // Main transcription handler
 export async function handleVideoTranscription(
-  body: TranscriptionRequest
+  body: TranscriptionRequest,
 ): Promise<TranscriptionResponse> {
   try {
     const file = await createFileFromRequest(body);
@@ -147,7 +145,11 @@ export async function handleVideoTranscription(
 
     const elevenlabsFormat = mapFormatToElevenLabs(body.format);
 
-    const responseData = await callElevenLabsAPI(file, cloudStorageUrl, elevenlabsFormat);
+    const responseData = await callElevenLabsAPI(
+      file,
+      cloudStorageUrl,
+      elevenlabsFormat,
+    );
 
     const {
       additional_formats: [
@@ -165,7 +167,7 @@ export async function handleVideoTranscription(
     if (body.format === 'speaker_separated') {
       const processedContent = processSpeakerSeparated(responseData);
       base64 = Buffer.from(processedContent, 'utf8').toString('base64');
-      
+
       return {
         base64,
         contentType: 'text/plain',
@@ -178,7 +180,7 @@ export async function handleVideoTranscription(
       const fullTranscript = extractFullTranscript(responseData);
       const processedContent = await generateAISummary(fullTranscript);
       base64 = Buffer.from(processedContent, 'utf8').toString('base64');
-      
+
       return {
         base64,
         contentType: 'text/plain',
@@ -193,8 +195,11 @@ export async function handleVideoTranscription(
       success: true,
       fileExtension: file_extension,
     };
-
   } catch (error) {
-    throw new Error(`Transcription failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    throw new Error(
+      `Transcription failed: ${
+        error instanceof Error ? error.message : 'Unknown error'
+      }`,
+    );
   }
-} 
+}

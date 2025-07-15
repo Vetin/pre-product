@@ -14,10 +14,10 @@ import Form, {
   createApi,
 } from './Layout.tsx';
 
-export default function Document() {
+export default function MarketingAssetsTranslator() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [link, setLink] = useState<string>('');
-  const [selectedLanguage, setSelectedLanguage] = useState<string>('EN-GB');
+  const [selectedLanguage, setSelectedLanguage] = useState<string>('en');
   const [tone, setTone] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [response, setResponse] = useState<File | null>(null);
@@ -45,7 +45,7 @@ export default function Document() {
         }
       : { ...basePayload, link };
 
-    const response = await api('/document', payload);
+    const response = await api('/marketing-assets', payload);
 
     setIsLoading(false);
 
@@ -107,8 +107,8 @@ export default function Document() {
                 <LanguageOption
                   language="English"
                   flag={<EnglishFlag />}
-                  isSelected={selectedLanguage === 'EN-GB'}
-                  onClick={() => setSelectedLanguage('EN-GB')}
+                  isSelected={selectedLanguage === 'en'}
+                  onClick={() => setSelectedLanguage('en')}
                 />
 
                 <LanguageOption
@@ -177,8 +177,8 @@ export default function Document() {
 }
 
 // const BASE_URL = 'https://pre-product.onrender.com';
-const BASE_URL = 'http://localhost:3000';
+const BASE_URL = 'http://localhost:3010';
 
 const api = createApi(BASE_URL);
 
-const ACCEPT = ['.pdf', '.doc', '.docx', '.ppt', '.pptx', '.ai', '.txt'];
+const ACCEPT = ['.pdf', '.doc', '.docx', '.txt'];

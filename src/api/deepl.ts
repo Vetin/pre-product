@@ -1,7 +1,8 @@
-import axios, { AxiosResponse } from 'axios';
+import axios, { AxiosResponse, isAxiosError } from 'axios';
 import FormData from 'form-data';
 import fs from 'fs';
-import path from 'path';
+import path, { extname, resolve } from 'path';
+import JSZip from 'jszip';
 import { downloadValidatedFile } from './download-file';
 
 // Types and interfaces
@@ -28,18 +29,6 @@ interface StatusResponse {
 type Formality = 'default' | 'more' | 'less' | 'prefer_more' | 'prefer_less';
 type TargetLanguage = 'DE' | 'EL' | string; // Add more language codes as needed
 
-// Constants
-const DEEPL_SUPPORTED_FORMATS: SupportedFormats = {
-  docx: true,
-  doc: true,
-  pdf: true,
-  txt: true,
-  pptx: true,
-  html: true,
-  htm: true,
-  xlsx: true,
-};
-
 const FILE_SIZE_LIMITS: FileSizeLimits = {
   docx: 50 * 1024 * 1024, // 50MB
   doc: 50 * 1024 * 1024,
@@ -49,6 +38,7 @@ const FILE_SIZE_LIMITS: FileSizeLimits = {
   html: 50 * 1024 * 1024,
   htm: 50 * 1024 * 1024,
   xlsx: 50 * 1024 * 1024,
+  epub: 50 * 1024 * 1024, // 50MB
 };
 
 // Custom error classes
@@ -160,6 +150,12 @@ export class DeepLTranslator {
     try {
       this.validateFile(filePath);
 
+      // Check if this is an EPUB file and use specialized translation
+      const fileExtension = path.extname(filePath).toLowerCase();
+      if (fileExtension === '.epub') {
+        return await this.translateEpub(filePath, targetLang, formality);
+      }
+
       const uploadResult = await this.uploadDocument(
         filePath,
         targetLang,
@@ -207,6 +203,7 @@ export class DeepLTranslator {
     try {
       const response = await downloadValidatedFile(url, {
         maxLength: Math.max(...Object.values(FILE_SIZE_LIMITS)),
+        contentTypes: [],
       });
 
       const tempPath = `temp_file${path.extname(url)}`;
@@ -227,6 +224,126 @@ export class DeepLTranslator {
         throw error;
       }
       throw new TranslationError(`URL translation failed: ${error.message}`);
+    }
+  }
+
+  async translateEpub(
+    filePath: string,
+    targetLang: TargetLanguage,
+    formality: Formality = 'default',
+  ): Promise<Buffer> {
+    try {
+      this.validateFile(filePath);
+
+      // Read and extract EPUB
+      const epubBuffer = fs.readFileSync(filePath);
+      const zip = await JSZip.loadAsync(epubBuffer);
+
+      // Files to translate
+      const filesToTranslate: Array<{
+        path: string;
+        content: string;
+        type: '.xhtml' | '.html' | '.opf' | '.ncx';
+      }> = [];
+
+      // Find translatable files
+      for (const [filePath, file] of Object.entries(zip.files)) {
+        if (!file.dir) {
+          const ext = extname(filePath);
+          if (
+            ext === '.xhtml' ||
+            ext === '.html' ||
+            ext === '.opf' ||
+            ext === '.ncx'
+          ) {
+            const content = await file.async('text');
+            filesToTranslate.push({ path: filePath, content, type: ext });
+          }
+        }
+      }
+
+      // Translate each file
+      for (const file of filesToTranslate) {
+        const { content, path } = file;
+
+        if (content.trim()) {
+          const tempHtmlPath = resolve(`temp_${Date.now()}.html`);
+
+          fs.writeFileSync(tempHtmlPath, content, { encoding: 'utf-8' });
+
+          try {
+            console.log('here', tempHtmlPath);
+            // Translate via DeepL (use direct upload/download to avoid recursion)
+            const uploadResult = await this.translateDocument(
+              tempHtmlPath,
+              targetLang,
+              formality,
+            ).catch(error => {
+              console.error(`Failed ${tempHtmlPath}`);
+              if (isAxiosError(error)) console.log(error.response.data);
+            });
+
+            if (!uploadResult) continue;
+
+            const translatedContent = uploadResult.toString('utf-8');
+
+            // Update the file in the ZIP with translated content
+            zip.file(path, translatedContent);
+
+            await new Promise(resolve => setTimeout(resolve, 1000));
+          } finally {
+            // Clean up temp file
+            if (fs.existsSync(tempHtmlPath)) {
+              // fs.unlinkSync(tempHtmlPath);
+            }
+          }
+        }
+      }
+
+      // Generate new EPUB
+      return Buffer.from(await zip.generateAsync({ type: 'arraybuffer' }));
+    } catch (error) {
+      if (
+        error instanceof FileValidationError ||
+        error instanceof TranslationError
+      ) {
+        throw error;
+      }
+      throw new TranslationError(`EPUB translation failed: ${error.message}`);
+    }
+  }
+
+  async translateEpubFromUrl(
+    url: string,
+    targetLang: TargetLanguage,
+    formality: Formality = 'default',
+  ) {
+    try {
+      const response = await downloadValidatedFile(url, {
+        maxLength: Math.max(...Object.values(FILE_SIZE_LIMITS)),
+        contentTypes: ['application/epub+zip'],
+      });
+
+      const tempPath = `temp_epub_${Date.now()}.epub`;
+      fs.writeFileSync(tempPath, response.data);
+
+      try {
+        return await this.translateEpub(tempPath, targetLang, formality);
+      } finally {
+        if (fs.existsSync(tempPath)) {
+          fs.unlinkSync(tempPath);
+        }
+      }
+    } catch (error) {
+      if (
+        error instanceof FileValidationError ||
+        error instanceof TranslationError
+      ) {
+        throw error;
+      }
+      throw new TranslationError(
+        `EPUB URL translation failed: ${error.message}`,
+      );
     }
   }
 }

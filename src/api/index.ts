@@ -18,6 +18,7 @@ import {
 } from './transcription';
 import { downloadValidatedFile } from './download-file';
 import { callElevenLabsAPI } from './elevenLabs';
+import { widnClient } from './marketing';
 
 const translator = new DeepLTranslator(Bun.env.DEEPL_API_KEY || '');
 
@@ -29,11 +30,12 @@ const ORIGINS = [
 ];
 
 new Elysia()
+  .get('/', () => 'Hello World')
   .use(
     cors({
-      origin: ORIGINS,
-      methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-      credentials: true,
+      origin: '*' /* || ORIGINS */,
+      // methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+      // credentials: true,
     }),
   )
   .post(
@@ -165,6 +167,139 @@ new Elysia()
       ]),
     },
   )
+  .post(
+    '/marketing-assets',
+    async ({ body }) => {
+      console.log('Start processing request');
+      console.dir(body, { depth: Infinity });
+
+      const { lang } = body;
+
+      if ('file' in body) {
+        const { file } = body;
+
+        const match = file.match(/^data:([^;]+);base64,(.+)$/);
+
+        if (!match)
+          return {
+            status: 'error',
+            message: 'Invalid file',
+          };
+
+        const fileBuffer = Buffer.from(match[2], 'base64');
+        const fileExtension = await fileTypeFromBuffer(fileBuffer);
+
+        // Validate supported file types
+        const supportedExtensions = ['txt', 'pdf', 'docx', 'doc'];
+        const ext = fileExtension?.ext || 'txt';
+
+        if (!supportedExtensions.includes(ext)) {
+          return {
+            status: 'error',
+            message: `Unsupported file type. Supported formats: ${supportedExtensions.join(
+              ', ',
+            )}`,
+          };
+        }
+
+        const pathToFile = `./${crypto.randomUUID()}.${ext}`;
+
+        await writeFile(pathToFile, fileBuffer);
+
+        try {
+          const translatedBuffer = await widnClient.translateDocument(
+            pathToFile,
+            lang,
+          );
+
+          const { sourceLanguage } = await widnClient.extractTextFromFile(
+            pathToFile,
+            ext,
+          );
+
+          return {
+            status: 'success',
+            data: translatedBuffer.toString('base64'),
+            sourceLanguage,
+            targetLanguage: lang,
+          };
+        } catch (error) {
+          switch (true) {
+            case error instanceof FileValidationError:
+              return {
+                status: 'error',
+                message: 'File validation error: ' + error.message,
+              };
+            case error instanceof TranslationError:
+              return {
+                status: 'error',
+                message: 'Translation error: ' + error.message,
+              };
+            default:
+              return {
+                status: 'error',
+                message: 'Unexpected error: ' + error,
+              };
+          }
+        } finally {
+          await rm(pathToFile);
+        }
+      }
+
+      if ('link' in body) {
+        try {
+          const { link } = body;
+
+          const translatedBuffer = await widnClient.translateFromUrl(
+            link,
+            lang,
+          );
+
+          return {
+            status: 'success',
+            data: translatedBuffer.toString('base64'),
+            targetLanguage: lang,
+          };
+        } catch (error) {
+          switch (true) {
+            case error instanceof FileValidationError:
+              return {
+                status: 'error',
+                message: 'File validation error: ' + error.message,
+              };
+            case error instanceof TranslationError:
+              return {
+                status: 'error',
+                message: 'Translation error: ' + error.message,
+              };
+            default:
+              return {
+                status: 'error',
+                message: 'Unexpected error: ' + error,
+              };
+          }
+        }
+      }
+
+      return {
+        status: 'error',
+        message: 'Invalid request',
+      };
+    },
+    {
+      body: t.Union([
+        t.Object({
+          lang: t.String(),
+          file: t.String(),
+        }),
+        t.Object({
+          lang: t.String(),
+          link: t.String(),
+        }),
+      ]),
+    },
+  )
+
   .post(
     '/subtitle',
     async ({ body }) => {
