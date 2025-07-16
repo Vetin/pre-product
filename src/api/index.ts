@@ -33,9 +33,9 @@ new Elysia()
   .get('/', () => 'Hello World')
   .use(
     cors({
-      origin: '*' /* || ORIGINS */,
-      // methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-      // credentials: true,
+      origin: ORIGINS,
+      methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+      credentials: true,
     }),
   )
   .post(

@@ -497,21 +497,57 @@ For marketing assets (brochures, ads, social media, etc.):
 
 1. **Just translate** - No additional explanations or context needed
 2. **Direct output only** - Provide translated text without commentary
-3. **Add emojis and hashtags** when they enhance marketing effectiveness in the target language
-4. **Include relevant hashtags** that match the marketing context and target audience
-5. **Use emojis strategically** to increase engagement and visual appeal
-6. **Maintain formatting** that supports visual design requirements
-7. **Preserve metrics and data** exactly as provided
-8. **Adapt currency, dates, and units** to target market standards
+3. **MANDATORY: Add emoji to each logical key point** - Every important statement, benefit, or call-to-action must have a relevant emoji
+4. **MANDATORY: Always add 3-7 relevant hashtags** at the end only
+5. **REQUIRED: Identify key bullets/points** and assign appropriate emojis to each
+6. **REQUIRED: Include hashtags** that match the marketing context and target audience
+7. **Maintain formatting** that supports visual design requirements
+8. **Preserve metrics and data** exactly as provided
+9. **Adapt currency, dates, and units** to target market standards
 
-## Output Format
-- Provide ONLY the translated text
-- Include appropriate emojis and hashtags when they add marketing value
-- No explanations, notes, or suggestions
-- No cultural considerations commentary
-- Pure translation focused on marketing effectiveness with enhanced social media optimization
+## CRITICAL OUTPUT FORMATTING REQUIREMENTS
+- Provide ONLY the translated text with clean formatting
+- MUST add emoji to every logical key point, benefit, feature, or call-to-action
+- MUST end with hashtags ONLY at the very end, separated by spaces
+- Use proper line breaks and paragraph structure
+- NO duplicate hashtags
+- NO hashtags mixed within the main text
+- Clean, professional presentation
 
-**Mission**: Deliver marketing-effective translations with strategic emoji and hashtag integration, without additional text or explanations.
+## Emoji Integration Rules - KEY REQUIREMENT
+- **MANDATORY: Add emoji to each logical key bullet/point** in the content
+- Identify all key statements, benefits, features, deadlines, calls-to-action
+- Assign one relevant emoji to each identified key point
+- Place emoji directly next to or within each key statement
+- Use emojis that align with the target culture and platform norms
+- Examples of key points that need emojis:
+  - Workshop/Event announcements
+  - Limited availability/urgency
+  - Registration calls-to-action
+  - Deadlines and time-sensitive offers
+  - Benefits and transformations
+  - Expert credentials
+  - Special offers/discounts
+
+## Hashtag Requirements
+- Include 3-7 relevant hashtags ONLY at the very end
+- Place hashtags after the main text, separated by spaces
+- Use hashtags in the target language when appropriate
+- NO duplicate hashtags
+- Format: #Hashtag1 #Hashtag2 #Hashtag3 (etc.)
+
+## Output Structure Format
+
+[Translated text with emoji for each logical key point] 🎯
+
+[Another key point with emoji] ⏰
+
+[Call-to-action with emoji] 🚀
+
+#Hashtag1 #Hashtag2 #Hashtag3 #Hashtag4 #Hashtag5
+
+
+**Mission**: Deliver clean, professionally formatted marketing translations with mandatory emoji integration for every logical key point and properly placed hashtags.
 `;
 
 const ma = new Elysia();
