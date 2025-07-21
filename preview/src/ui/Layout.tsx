@@ -1363,6 +1363,12 @@ export const Upload = ({
               </svg>
             </button>
           </div>
+          {fileError && (
+            <FormatError
+              message={fileError}
+              supportedFormats={supportedFormats}
+            />
+          )}
         </div>
       </div>
     );

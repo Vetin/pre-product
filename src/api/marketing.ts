@@ -132,6 +132,8 @@ class WidnAIClient {
   ): Promise<{ text: string; sourceLanguage: string }> {
     let text = '';
 
+    console.log('ex');
+
     switch (fileExtension.toLowerCase()) {
       case 'txt':
         text = await readFile(filePath, 'utf-8');
@@ -145,7 +147,11 @@ class WidnAIClient {
 
       case 'docx':
       case 'doc':
-        const docResult = await mammoth.extractRawText({ path: filePath });
+        const docResult = await mammoth
+          .extractRawText({ path: filePath })
+          .catch(() => {
+            throw 'Can not extract file text';
+          });
         text = docResult.value;
         break;
 
@@ -155,8 +161,10 @@ class WidnAIClient {
         );
     }
 
+    console.log('detecting language');
     // First try to detect language using Widn API, fallback to franc
     const sourceLanguage = await this.detectLanguageWithAPI(text);
+    console.log('detected language', sourceLanguage);
     return { text, sourceLanguage };
   }
 
@@ -191,14 +199,14 @@ class WidnAIClient {
 
       if (!response.ok) {
         const errorText = await response.text();
-        console.log(errorText);
+
         throw new TranslationError(
           `Widn AI API error: ${response.status} - ${errorText}`,
         );
       }
 
       const result = await response.json();
-      console.log(result);
+
       return result.targetText.join('\n');
     } catch (error) {
       if (error instanceof TranslationError) throw error;
@@ -248,33 +256,6 @@ class WidnAIClient {
     targetLanguage: string,
     sourceLanguage?: string,
   ): Promise<void> {
-    console.log({
-      targetLocale: targetLanguage,
-      sourceLocale: sourceLanguage,
-      instructions: SYSTEM_PROMPT,
-      model: 'sugarloaf-4.0',
-      fewshotExamples: [
-        {
-          source:
-            'Присоединяйтесь к нашему эксклюзивному мастер-классу! Ограниченное количество мест. Регистрируйтесь сейчас и экономьте 50%. Предложение заканчивается завтра.',
-          target:
-            'Join our exclusive workshop! 🎯 Limited seats available. ⏰ Register now and save 50%. 💰 Offer ends tomorrow. 🔥\n\n#Workshop #ExclusiveEvent #RegisterNow #SaveMoney #LimitedOffer',
-        },
-        {
-          source:
-            '¡Lanzamiento de nuevo producto! Tecnología revolucionaria. Fácil de usar. Resultados en 24 horas. ¡Ordena hoy!',
-
-          target:
-            'New product launch! 🚀 Revolutionary technology. ⚡ Easy to use. 👌 Results in 24 hours. ⏰ Order today! 🛒\n\n#NewProduct #Revolutionary #EasyToUse #FastResults #OrderToday',
-        },
-        {
-          source:
-            "Les soldes d'été commencent maintenant! Jusqu'à 70% de réduction. Livraison gratuite. Offre limitée dans le temps.",
-          target:
-            'Summer sale starts now! ☀️ Up to 70% off. 💥 Free shipping. 🚚 Limited time only. ⏰\n\n#SummerSale #DiscountSale #FreeShipping #LimitedTime',
-        },
-      ],
-    });
     try {
       const response = await fetch(
         `${this.baseUrl}/translate-file/${fileId}/translate`,
@@ -291,6 +272,27 @@ class WidnAIClient {
               instructions: SYSTEM_PROMPT,
               tone: 'formal',
               model: 'sugarloaf',
+              fewshotExamples: [
+                {
+                  source:
+                    'Присоединяйтесь к нашему эксклюзивному мастер-классу! Ограниченное количество мест. Регистрируйтесь сейчас и экономьте 50%. Предложение заканчивается завтра.',
+                  target:
+                    'Join our exclusive workshop! 🎯 Limited seats available. ⏰ Register now and save 50%. 💰 Offer ends tomorrow. 🔥\n\n#Workshop #ExclusiveEvent #RegisterNow #SaveMoney #LimitedOffer',
+                },
+                {
+                  source:
+                    '¡Lanzamiento de nuevo producto! Tecnología revolucionaria. Fácil de usar. Resultados en 24 horas. ¡Ordena hoy!',
+
+                  target:
+                    'New product launch! 🚀 Revolutionary technology. ⚡ Easy to use. 👌 Results in 24 hours. ⏰ Order today! 🛒\n\n#NewProduct #Revolutionary #EasyToUse #FastResults #OrderToday',
+                },
+                {
+                  source:
+                    "Les soldes d'été commencent maintenant! Jusqu'à 70% de réduction. Livraison gratuite. Offre limitée dans le temps.",
+                  target:
+                    'Summer sale starts now! ☀️ Up to 70% off. 💥 Free shipping. 🚚 Limited time only. ⏰\n\n#SummerSale #DiscountSale #FreeShipping #LimitedTime',
+                },
+              ],
             },
           }),
         },
@@ -298,7 +300,7 @@ class WidnAIClient {
 
       if (!response.ok) {
         const errorText = await response.text();
-        console.log(errorText);
+
         throw new TranslationError(
           `Failed to start translation: ${response.status} - ${errorText}`,
         );
